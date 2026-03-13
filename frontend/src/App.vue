@@ -1,12 +1,21 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
+
+let socket = null
+onMounted(() =>{
+  socket = new WebSocket("ws://localhost:8000/ws")
+
+  socket.onmessage = (msg) => {
+    console.log("message:", msg.data)
+  }
+})
 </script>
 
 <template>
   <header>
     <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
     <div class="wrapper">
       <HelloWorld msg="You did it!" />
 
@@ -17,7 +26,6 @@ import HelloWorld from './components/HelloWorld.vue'
     </div>
   </header>
 
-  <RouterView />
 </template>
 
 <style scoped>

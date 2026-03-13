@@ -1,61 +1,85 @@
 import cv2
+import asyncio
+import websockets
+import json
 
-count = 0
-video_path = "videos/aruco_sample.mp4"
-prev = None
+async def main():
 
-# ArUcoの設定 (4x4の格子、50種類までのIDを使用する設定)
-aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
-parameters = cv2.aruco.DetectorParameters()
-detector = cv2.aruco.ArucoDetector(aruco_dict, parameters)
+    name = "hanbun"
+    video_path = f"videos/{name}.mp4"
+    url = "ws://localhost:8000/ws"
 
-# カメラの開始 (0番は通常インカメ)
-cap = cv2.VideoCapture(video_path)
+    prev = None
+    count = 0
+    sent = None
 
-while True:
-    ret, frame = cap.read()
-    if not ret:
-        print("終了")
-        break
+    # ArUcoの設定 (4x4の格子、50種類までのIDを使用する設定)
+    aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
+    parameters = cv2.aruco.DetectorParameters()
+    detector = cv2.aruco.ArucoDetector(aruco_dict, parameters)
 
-    # マーカーの検出
-    corners, ids, rejectedImgPoints = detector.detectMarkers(frame)
+    # カメラの開始 (0番は通常インカメ)
+    cap = cv2.VideoCapture(video_path)
 
-    areas = {}
-    read = None
-    Id = None
+    async with websockets.connect(url) as ws:
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                print("終了")
+                break
 
-    # マーカーが見つかったら枠を描画
-    if ids is not None:
-        cv2.aruco.drawDetectedMarkers(frame, corners, ids)
-         
-        ans = None
-        for i in range(len(ids)):
-            c = corners[i][0]
-            area = cv2.contourArea(c)
-            Id = ids[i][0]
-            areas[str(Id)] = area
-            # print("ID:", ID, "面積:", area )
-        if len(ids) >= 2:
-            ans = max(areas, key=areas.get)
-            # print("大きいのは",ans, "面積は", max(areas.values()))
-            pass
-        else:
-            ans = Id
-            # print("読み取ったのは:", ans)
-        prev = ans
-        print(ans)
-    # else:
-    #     count += 1
-    # print(count)
+            # マーカーの検出
+            corners, ids, rejectedImgPoints = detector.detectMarkers(frame)
 
+            areas = {}
+            Id = None
+            ans = None
 
-    # 画面表示
-    cv2.imshow('Kiha 110 Safety System Test', frame)
+            # マーカーが見つかったら枠を描画
+            if ids is not None:
+                cv2.aruco.drawDetectedMarkers(frame, corners, ids)
+                 
+                for i in range(len(ids)):
+                    c = corners[i][0]
+                    area = cv2.contourArea(c)
+                    Id = ids[i][0]
+                    areas[str(Id)] = area
+                    # print("ID:", ID, "面積:", area )
 
-    # 'q'キーで終了
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+                # 大きく映ったほうだけ採用
+                if len(ids) >= 2:
+                    ans = int(max(areas, key=areas.get))
+                    # print("大きいのは",ans, "面積は", max(areas.values()))
+                    pass
+                else:
+                    ans = int(Id)
 
-cap.release()
-cv2.destroyAllWindows()
+                # 3連続判定で鯖に送信
+                if prev == ans:
+                    if count >= 3 and sent != ans:
+                        print("読み取り成功：", json.dumps({"data": ans}))
+                        await ws.send(str(ans))
+                        sent = ans
+                    count += 1
+                else:
+                    count = 0
+                prev = ans
+                # print(sent)
+
+            # else:
+            #     count += 1
+            # print(count)
+
+            # 画面表示
+            cv2.imshow('Kiha 110 Safety System Test', frame)
+
+            # 'q'キーで終了
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+
+            await asyncio.sleep(0.01)
+
+    cap.release()
+    cv2.destroyAllWindows()
+
+asyncio.run(main())

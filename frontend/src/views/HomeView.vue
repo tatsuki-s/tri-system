@@ -4,6 +4,7 @@ import TheWelcome from '../components/TheWelcome.vue'
 
 <template>
   <main>
+    <p>ここに現在の位置</p>
     <TheWelcome />
   </main>
 </template>
