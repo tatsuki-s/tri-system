@@ -3,81 +3,100 @@ import asyncio
 import websockets
 import json
 
+USE_WS = True
+
+class ArUcoProcess:
+    def __init__(self, threshold=3):
+        self.prev = None
+        self.count = 0
+        self.sent = None
+        self.threshold = 3
+
+        # ArUcoの設定 (4x4の格子、50種類までのIDを使用する設定)
+        aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
+        parameters = cv2.aruco.DetectorParameters()
+        self.detector = cv2.aruco.ArucoDetector(aruco_dict, parameters)
+
+    def frame_process(self, frame):
+        # マーカーの検出
+        # corners, ids, rejectedImgPoints = processor.detector.detectMarkers(frame)
+        corners, ids, _ = self.detector.detectMarkers(frame)
+
+        areas = {}
+        read_id = None
+        ans = None
+
+        # マーカーが見つかったら枠を描画
+        if ids is not None:
+            cv2.aruco.drawDetectedMarkers(frame, corners, ids)
+             
+            for i in range(len(ids)):
+                c = corners[i][0]
+                area = cv2.contourArea(c)
+                read_id = ids[i][0]
+                areas[str(read_id)] = area
+                # print("ID:", ID, "面積:", area )
+
+            # 大きく映ったほうだけ採用
+            if len(ids) >= 2:
+                ans = int(max(areas, key=areas.get))
+                # print("大きいのは",ans, "面積は", max(areas.values()))
+                pass
+            else:
+                ans = int(read_id)
+
+            # 3連続判定で鯖に送信
+            if self.prev == ans:
+                if self.count >= self.threshold and self.sent != ans:
+                    self.sent = ans
+                    return ans
+                self.count += 1
+            else:
+                self.count = 0
+            self.prev = ans
+
 async def main():
 
-    name = "hanbun"
+    name = "shoumenshoutotsu"
     video_path = f"videos/{name}.mp4"
     url = "ws://localhost:8000/ws"
-
-    prev = None
-    count = 0
-    sent = None
-
-    # ArUcoの設定 (4x4の格子、50種類までのIDを使用する設定)
-    aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
-    parameters = cv2.aruco.DetectorParameters()
-    detector = cv2.aruco.ArucoDetector(aruco_dict, parameters)
-
+    ws = None
     # カメラの開始 (0番は通常インカメ)
     cap = cv2.VideoCapture(video_path)
+    processor = ArUcoProcess(threshold=3)
 
-    async with websockets.connect(url) as ws:
-        while True:
-            ret, frame = cap.read()
-            if not ret:
-                print("終了")
-                break
+    if USE_WS:
+        try:
+            ws = await websockets.connect(url)
+            print("接続成功")
+        except Exception as e:
+            print("接続失敗", e)
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            print("終了")
+            break
 
-            # マーカーの検出
-            corners, ids, rejectedImgPoints = detector.detectMarkers(frame)
+        result = processor.frame_process(frame)
+        if result is not None:
+            result_json = json.dumps({"data": result})
+            print("読み取り成功：", result_json)
 
-            areas = {}
-            Id = None
-            ans = None
+            if ws:
+                try:
+                    await ws.send(result_json)
+                except Exception as e:
+                    print("error", e)
+                    ws = None
 
-            # マーカーが見つかったら枠を描画
-            if ids is not None:
-                cv2.aruco.drawDetectedMarkers(frame, corners, ids)
-                 
-                for i in range(len(ids)):
-                    c = corners[i][0]
-                    area = cv2.contourArea(c)
-                    Id = ids[i][0]
-                    areas[str(Id)] = area
-                    # print("ID:", ID, "面積:", area )
+        # 画面表示
+        cv2.imshow('Kiha 110 Safety System', frame)
 
-                # 大きく映ったほうだけ採用
-                if len(ids) >= 2:
-                    ans = int(max(areas, key=areas.get))
-                    # print("大きいのは",ans, "面積は", max(areas.values()))
-                    pass
-                else:
-                    ans = int(Id)
+        # 'q'キーで終了
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
-                # 3連続判定で鯖に送信
-                if prev == ans:
-                    if count >= 3 and sent != ans:
-                        print("読み取り成功：", json.dumps({"data": ans}))
-                        await ws.send(str(ans))
-                        sent = ans
-                    count += 1
-                else:
-                    count = 0
-                prev = ans
-                # print(sent)
-
-            # else:
-            #     count += 1
-            # print(count)
-
-            # 画面表示
-            cv2.imshow('Kiha 110 Safety System Test', frame)
-
-            # 'q'キーで終了
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-
-            await asyncio.sleep(0.01)
+        await asyncio.sleep(0.01)
 
     cap.release()
     cv2.destroyAllWindows()
