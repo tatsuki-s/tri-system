@@ -17,13 +17,12 @@ onMounted(() =>{
 <template>
   <header>
     <div>
-
-      <p>{{wsData}}</p>
-
       <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
+        <RouterLink to="/train-list" :props="wsData">車載</RouterLink>
+        <br>
+        <RouterLink to="/settings">閉塞設定</RouterLink>
       </nav>
+      <RouterView />
     </div>
   </header>
 

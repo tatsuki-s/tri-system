@@ -1,6 +1,7 @@
-// import './assets/main.css'
-
 import { createApp } from 'vue'
+// import './assets/main.css'
+// import tailwindcss from '@tailwindcss/vite'
+import './assets/main.css'
 import App from './App.vue'
 import router from './router'
 
