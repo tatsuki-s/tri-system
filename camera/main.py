@@ -61,18 +61,23 @@ async def main():
     video_path = f"videos/{name}.mp4"
     url = "ws://localhost:8000/ws"
     ws = None
+    connect_wait = 300
+    count = connect_wait
     # カメラの開始 (0番は通常インカメ)
     cap = cv2.VideoCapture(video_path)
     processor = ArUcoProcess(threshold=3)
 
-    if USE_WS:
-        try:
-            ws = await websockets.connect(url)
-            print("接続成功")
-        except Exception as e:
-            print("接続失敗", e)
     while True:
+        if USE_WS and ws == None and count >= connect_wait:
+            print("接続します")
+            count = 0
+            try:
+                ws = await websockets.connect(url)
+                print("接続成功")
+            except Exception as e:
+                print("接続失敗", e)
         ret, frame = cap.read()
+
         if not ret:
             print("終了")
             break
@@ -85,6 +90,7 @@ async def main():
             if ws:
                 try:
                     await ws.send(result_json)
+                    print("送信成功", result_json)
                 except Exception as e:
                     print("error", e)
                     ws = None
@@ -96,6 +102,7 @@ async def main():
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
+        count += 1
         await asyncio.sleep(0.01)
 
     cap.release()
