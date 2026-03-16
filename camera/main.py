@@ -73,6 +73,7 @@ async def main():
             count = 0
             try:
                 ws = await websockets.connect(url)
+                await ws.send("connected camera")
                 print("接続成功")
             except Exception as e:
                 print("接続失敗", e)
