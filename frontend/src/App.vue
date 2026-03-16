@@ -5,7 +5,7 @@ import { RouterLink, RouterView } from 'vue-router'
 let socket = null
 const wsData = ref("")
 onMounted(() =>{
-  socket = new WebSocket("ws://localhost:8000/ws")
+  socket = new WebSocket("ws://localhost:8000")
 
   socket.onmessage = (msg) => {
     console.log("message:", msg.data)
