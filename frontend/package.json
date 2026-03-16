@@ -11,6 +11,7 @@
     "type-check": "vue-tsc --build"
   },
   "dependencies": {
+    "@tailwindcss/forms": "^0.5.11",
     "vue": "^3.5.29",
     "vue-router": "^5.0.3"
   },
