@@ -1,13 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router'
-// import HomeView from '../views/HomeView.vue'
+import Menu from '../views/Menu.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    // {
-    //   path: '/',
-    // }
-    
+    {
+      path: '/',
+      name: 'menu',
+      component: Menu,
+      props: true,
+    }, 
     {
       path: '/train-list',
       name: 'train-list',

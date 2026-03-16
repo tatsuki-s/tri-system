@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
 
 let socket = null
 const wsData = ref("")
+const wsUrl = import.meta.env.WS_HOST || "localhost"
 onMounted(() =>{
-  socket = new WebSocket("ws://localhost:8000")
+  socket = new WebSocket(`ws://${wsUrl}:8000`)
 
   socket.onmessage = (msg) => {
     console.log("message:", msg.data)
@@ -17,11 +18,6 @@ onMounted(() =>{
 <template>
   <header>
     <div>
-      <nav>
-        <RouterLink to="/train-list" :props="wsData">車載</RouterLink>
-        <br>
-        <RouterLink to="/settings">閉塞設定</RouterLink>
-      </nav>
       <RouterView />
     </div>
   </header>
