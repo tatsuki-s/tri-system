@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, provide } from 'vue'
 import { RouterView } from 'vue-router'
 
 let socket = null
@@ -12,16 +12,16 @@ onMounted(() =>{
     console.log("message:", msg.data)
     wsData.value = msg.data
   }
+
+  provide("wsData", wsData)
 })
 </script>
-
 <template>
   <header>
     <div>
       <RouterView />
     </div>
   </header>
-
 </template>
 
 <style scoped>

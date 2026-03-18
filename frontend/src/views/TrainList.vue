@@ -1,7 +1,14 @@
 <script setup lang="ts">
+import { inject } from "vue"
+import { RouterLink } from "vue"
+
+const data = inject("wsData")
+console.log(data)
+//if(data.type === "camera"){
+  //console.log("this is camera")
+//}
 
 </script>
 <template>
-  <p>{{}}</p>
-  <p class="text-blue-600">車載</p>
+  <p>{{data}}</p>
 </template>

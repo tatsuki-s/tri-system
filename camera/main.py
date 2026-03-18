@@ -5,6 +5,17 @@ import json
 
 USE_WS = True
 
+data = {
+    "type": "camera",
+    "data": {
+        "id": 1,
+        "status": "connected",
+        "read_id": None
+        }
+    }
+
+result_json = json.dumps({"data": data})
+
 class ArUcoProcess:
     def __init__(self, threshold=3):
         self.prev = None
@@ -73,7 +84,8 @@ async def main():
             count = 0
             try:
                 ws = await websockets.connect(url)
-                await ws.send("connected camera")
+                data["data"]["status"] = "connected"
+                await ws.send(json.dumps(data))
                 print("接続成功")
             except Exception as e:
                 print("接続失敗", e)
@@ -85,19 +97,19 @@ async def main():
 
         result = processor.frame_process(frame)
         if result is not None:
-            result_json = json.dumps({"data": result})
-            print("読み取り成功：", result_json)
+            print("読み取り成功：", result)
 
             if ws:
                 try:
-                    await ws.send(result_json)
-                    print("送信成功", result_json)
+                    data["data"]["read_id"] = result
+                    await ws.send(json.dumps(data))
+                    print("送信成功", data)
                 except Exception as e:
                     print("error", e)
                     ws = None
 
         # 画面表示
-        cv2.imshow('Kiha 110 Safety System', frame)
+        # cv2.imshow('Kiha 110 Safety System', frame)
 
         # 'q'キーで終了
         if cv2.waitKey(1) & 0xFF == ord('q'):

@@ -1,8 +1,9 @@
 export interface Camera {
   type: "camera",
   main: {
-    trainId: number,
-    readId: number
+    id: number,
+    status: string,
+    read_id: number
   }
 }
 export type WSMessage = Camera
