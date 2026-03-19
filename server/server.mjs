@@ -18,18 +18,18 @@ wss.on('connection', (ws) => {
       if(client.readyState === 1){
         jsonData = JSON.parse(payload)
         console.log("json:",jsonData)
-        // カメラのデータを受け取ったときの処理
+        // カメラのデータだったときの処理
         if (jsonData.type === "camera"){
           const trainId = jsonData.data.id
-          
           activeData.trains[trainId] = jsonData.data
           console.log("trains:", activeData.trains)
         }
 
-        client.send(payload.toString());
+        client.send(JSON.stringify(activeData));
+        console.log(JSON.stringify(activeData));
       }
     });
-    ws.send(payload.toString());
+    // ws.send(payload.toString());
   });
 
   ws.send('Connected');
