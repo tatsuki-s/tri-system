@@ -4,28 +4,32 @@ const wss = new WebSocketServer({ port: 8000});
 let jsonData
 
 let activeData = {
-  trains: [],
-  points: []
+  trains: {},
+  points: {}
 }
 
 wss.on('connection', (ws) => {
   ws.on('error', console.error);
 
-  ws.on('message', (data) => {
-    console.log('received: %s', data);
+  ws.on('message', (payload) => {
+    console.log("received");
     wss.clients.forEach((client) => {
+      // 中身があるか
       if(client.readyState === 1){
-        jsonData = JSON.parse(data)
+        jsonData = JSON.parse(payload)
         console.log("json:",jsonData)
+        // カメラのデータを受け取ったときの処理
         if (jsonData.type === "camera"){
-          activeData.trains.push(jsonData) 
-          console.log(activeData)
+          const trainId = jsonData.data.id
+          
+          activeData.trains[trainId] = jsonData.data
+          console.log("trains:", activeData.trains)
         }
 
-        client.send(data.toString());
+        client.send(payload.toString());
       }
     });
-    ws.send(data.toString());
+    ws.send(payload.toString());
   });
 
   ws.send('Connected');

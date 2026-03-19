@@ -4,11 +4,12 @@ import websockets
 import json
 
 USE_WS = True
+TRAIN_ID = 2
 
 data = {
     "type": "camera",
     "data": {
-        "id": 1,
+        "id": TRAIN_ID,
         "status": "connected",
         "read_id": None
         }
