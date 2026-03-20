@@ -3,6 +3,7 @@ import { WebSocketServer } from "ws";
 const wss = new WebSocketServer({ port: 8000});
 let jsonData
 
+// 全データを管理
 let activeData = {
   trains: {},
   points: {}
@@ -41,7 +42,11 @@ wss.on("connection", (ws) => {
 });
 
 const broadcast = () => {
-  const data = JSON.stringify(activeData);
+  // 送信用データ
+  const formatted = {
+    trains: Object.values(activeData.trains),
+  }
+  const data = JSON.stringify(formatted);
   wss.clients.forEach(client => {
     if(client.readyState === 1){
       client.send(data);

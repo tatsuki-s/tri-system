@@ -17,8 +17,15 @@ const router = createRouter({
       props: true,
     }, 
     {
-      path: '/settings/:id',
+      path: '/train-list/:id',
+      name: 'train',
+      component: () => import('../views/Train.vue'),
+      props: true,
+    }, 
+    {
+      path: '/settings',
       name: 'settings',
+      props: true,
       // route level code-splitting
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
