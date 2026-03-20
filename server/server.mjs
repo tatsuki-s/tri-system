@@ -8,30 +8,44 @@ let activeData = {
   points: {}
 }
 
-wss.on('connection', (ws) => {
-  ws.on('error', console.error);
+wss.on("connection", (ws) => {
 
-  ws.on('message', (payload) => {
-    console.log("received");
-    wss.clients.forEach((client) => {
-      // 中身があるか
-      if(client.readyState === 1){
-        jsonData = JSON.parse(payload)
-        console.log("json:",jsonData)
-        // カメラのデータだったときの処理
-        if (jsonData.type === "camera"){
-          const trainId = jsonData.data.id
-          activeData.trains[trainId] = jsonData.data
-          console.log("trains:", activeData.trains)
-        }
+  let nowTrainId = null
 
-        client.send(JSON.stringify(activeData));
-        console.log(JSON.stringify(activeData));
-      }
-    });
-    // ws.send(payload.toString());
+  ws.on("error", console.error);
+
+  ws.on("message", (payload) => {
+    jsonData = JSON.parse(payload);
+    console.log("received", jsonData);
+    // カメラのデータだったときの処理
+    if (jsonData.type === "camera"){
+      const trainId = jsonData.data.id;
+      nowTrainId = trainId;
+      activeData.trains[trainId] = jsonData.data;
+      console.log("trains:", activeData.trains);
+    };
+  broadcast();
   });
 
-  ws.send('Connected');
+  ws.on("close", () => {
+    // idがリストに追加済みか確認
+    if(nowTrainId !==null){
+      console.log(activeData.trains[nowTrainId], "を削除")
+      delete activeData.trains[nowTrainId];
+    }
+    
+    broadcast();
+  });
+
+  ws.send("Connected");
 });
 
+const broadcast = () => {
+  const data = JSON.stringify(activeData);
+  wss.clients.forEach(client => {
+    if(client.readyState === 1){
+      client.send(data);
+      console.log("送信：", data)
+    }
+  });
+};
