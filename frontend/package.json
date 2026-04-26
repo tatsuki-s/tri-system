@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@tailwindcss/forms": "^0.5.11",
+    "mqtt": "^5.15.1",
     "vue": "^3.5.29",
     "vue-router": "^5.0.3"
   },
