@@ -1,0 +1,10 @@
+services:
+  mqtt:
+    image: eclipse-mosquitto:latest
+    container_name: mosquitto_debug
+    ports:
+      - "1883:1883"
+      - "9001:9001" # WebSockets用
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+
