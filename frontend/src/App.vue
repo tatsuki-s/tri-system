@@ -16,6 +16,8 @@ onMounted(() =>{
   client = mqtt.connect(url, {
     keepalive: 5, //5sec
     clientId: 'vue-' + Math.random().toString(16).substring(2, 8),
+    clean: true,
+    reconnectPeriod: 5000,
   })
 
   client.on('connect', () => {
@@ -23,9 +25,14 @@ onMounted(() =>{
     mqttData.value = client
   })
 
+  client.on('close', () => {
+    console.log("Disconnected")
+  })
+
   client.on('error', (err: any) => {
     console.error('MQTT Connection Error:', err)
   })
+
 
 })
 

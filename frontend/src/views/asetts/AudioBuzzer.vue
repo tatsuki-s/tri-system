@@ -15,8 +15,17 @@ let intervalId: number | null = null
 let oscillator: OscillatorNode | null = null
 let gainNode: GainNode | null = null
 
-const startAlert = () => {
+const startAlert = async () => {
   if (isPlaying.value || !props.audioCtx) return
+
+  if (props.audioCtx.state === 'suspended') {
+    await props.audioCtx.resume().catch(() => {})
+  }
+
+  if (props.audioCtx.state === 'suspended') {
+    console.warn("skip Audio")
+    return
+  }
 
   isPlaying.value = true
 
@@ -25,25 +34,25 @@ const startAlert = () => {
   gainNode = props.audioCtx.createGain()
 
   oscillator.type = 'sine'
-  oscillator.frequency.setValueAtTime(props.frequency, props.audioCtx.currentTime)
+  oscillator.frequency.setValueAtTime(props.frequency, 0)
   
   oscillator.connect(gainNode)
   gainNode.connect(props.audioCtx.destination)
-  oscillator.start()
+  oscillator.start(0)
 
   let soundOn = true
 
   // タイマーで音量を切り替える
   intervalId = window.setInterval(() => {
     if (!gainNode || !props.audioCtx) return
-    const targetGain = soundOn ? 0.2 : 0
-    gainNode.gain.setValueAtTime(targetGain, props.audioCtx.currentTime)
+    const targetGain = soundOn ? 0.4 : 0
+    gainNode.gain.setValueAtTime(targetGain, 0)
     soundOn = !soundOn
   }, props.intervalMs)
 }
 
 const stopAlert = () => {
-  if (!isPlaying.value) return
+  //if (!isPlaying.value) return
 
   if (intervalId) {
     clearInterval(intervalId)
@@ -64,6 +73,15 @@ const stopAlert = () => {
   isPlaying.value = false
 }
 
+const button = () => {
+  if (isPlaying.value){
+    stopAlert()
+  }
+  else{
+    startAlert()
+  }
+}
+
 // 🟢 このコンポーネント（画面からこの音が消えたら）自動でタイマーを消去
 onUnmounted(() => {
   stopAlert()
@@ -77,13 +95,13 @@ defineExpose({
 
 <template>
   <div class="buzzer-card">
-    <h3>{{ title }}</h3>
+    <!-- <h3>{{ title }}</h3> -->
     <p class="spec">({{ frequency }}Hz / 間隔: {{ intervalMs }}ms)</p>
     
-    <button class="start-btn" @click="startAlert" :disabled="isPlaying">鳴らす</button>
-    <button class="stop-btn" @click="stopAlert" :disabled="!isPlaying">止める</button>
+    <button class="start-btn" @click="button">鳴らす/止める</button>
+    <!-- <button class="stop-btn" @click="stopAlert">止める</button> -->
     
-    <span class="status-badge" :class="{ active: isPlaying }">
+    <span :class="{ active: isPlaying }">
       {{ isPlaying ? "鳴動中" : "停止中" }}
     </span>
   </div>
@@ -108,14 +126,4 @@ button {
   border-radius: 4px;
   cursor: pointer;
 }
-button:disabled { opacity: 0.5; cursor: not-allowed; }
-.start-btn { background-color: #ff4d4d; color: white; }
-.stop-btn { background-color: #cccccc; color: #333; }
-.status-badge {
-  float: right;
-  font-weight: bold;
-  color: #999;
-  margin-top: 8px;
-}
-.status-badge.active { color: #ff4d4d; }
 </style>

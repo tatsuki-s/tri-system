@@ -8,15 +8,10 @@ interface EmergencyData{
   sender: string
 }
 
-const audioCtx = ref<AudioContext | null >(null)
+const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)()
 const emergencyButton = ref<InstanceType<typeof AudioBuzzer> | null>(null)
 
 // ユーザーが最初に画面のどこかをクリックした時にAudioContextを初期化する（ブラウザ制限対策）
-const initAudio = () => {
-  if (!audioCtx.value) {
-    audioCtx.value = new (window.AudioContext || (window as any).webkitAudioContext)()
-  }
-}
 const data = inject<any>("mqttData")
 
 const trains = ref("---")
@@ -33,11 +28,16 @@ const handleMessage = (receivedTopic: string, msg: any) => {
     case "emergency":
       emergency.value = JSON.parse(rawData)
       if (emergency.value){
-        if (emergency.value.status === 1){
-          emergencyButton.value?.startAlert()
+        try{
+          if (emergency.value.status === 1){
+            emergencyButton.value?.startAlert()
+          }
+          else if (emergency.value.status === 0){
+            emergencyButton.value?.stopAlert()
+          }
         }
-        else if (emergency.value.status === 0){
-          emergencyButton.value?.stopAlert()
+        catch{
+          console.log("gomi")
         }
       }
       break
@@ -50,20 +50,20 @@ watch(() => data?.value, (newData) => {
     newData.subscribe(topics)
     newData.on("message", handleMessage)
   }
-})
-
-console.log(data)
+  },{
+  immediate: true}
+  )
 
 onUnmounted(() => {
   if(data?.value) {
     data.value.unsubscribe(topics)
-    data.value.off("message")
+    data.value.off("message", handleMessage)
   }
 })
 
 </script>
 <template>
-  <div @click="initAudio()">
+  <!-- <div> -->
     <!-- <p>{{data}}</p> -->
     <h1>車両一覧</h1>
     <p>{{trains}}</p>
@@ -82,5 +82,5 @@ onUnmounted(() => {
     <!--     </RouterLink> -->
     <!--   </li> -->
     <!-- </ul> -->
-  </div>
+  <!-- </div> -->
 </template>
