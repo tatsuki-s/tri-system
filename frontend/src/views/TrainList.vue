@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { inject, watch, ref, onUnmounted } from "vue"
 import { RouterLink } from "vue-router"
-import AudioBusser from "./asetts/AudioBuzzer.vue"
 import AudioBuzzer from "./asetts/AudioBuzzer.vue"
 
 interface EmergencyData{
@@ -33,18 +32,24 @@ const handleMessage = (receivedTopic: string, msg: any) => {
       break
     case "emergency":
       emergency.value = JSON.parse(rawData)
-      if (emergency.value && emergency.value.status === 1){
-        initAudio()
-        emergencyButton.value?.startAlert()
+      if (emergency.value){
+        if (emergency.value.status === 1){
+          emergencyButton.value?.startAlert()
+        }
+        else if (emergency.value.status === 0){
+          emergencyButton.value?.stopAlert()
+        }
       }
       break
   }
 }
 
 watch(() => data?.value, (newData) => {
-  if (newData) {}
-  newData.subscribe(topics)
-  newData.on("message", handleMessage)
+  if (newData) {
+    newData.off("message", handleMessage)
+    newData.subscribe(topics)
+    newData.on("message", handleMessage)
+  }
 })
 
 console.log(data)
@@ -58,22 +63,24 @@ onUnmounted(() => {
 
 </script>
 <template>
-  <!-- <p>{{data}}</p> -->
-  <h1>車両一覧</h1>
-  <p>{{trains}}</p>
-  <AudioBuzzer
-      ref="emergencyButton"
-      title="緊急"
-      :frequency="2600"
-      :interval-ms="100"
-      :audio-ctx="audioCtx"
-  />
-  <!-- <p>{{emergency}}</p> -->
-  <!-- <ul v-if="data"> -->
-  <!--   <li v-for="train in data.trains">  -->
-  <!--     <RouterLink :to="`train-list/${train.id}`"> -->
-  <!--       id: {{train.id}}, 現在位置：{{train.read_id}} -->
-  <!--     </RouterLink> -->
-  <!--   </li> -->
-  <!-- </ul> -->
+  <div @click="initAudio()">
+    <!-- <p>{{data}}</p> -->
+    <h1>車両一覧</h1>
+    <p>{{trains}}</p>
+    <AudioBuzzer
+        ref="emergencyButton"
+        title="緊急"
+        :frequency="2600"
+        :interval-ms="100"
+        :audio-ctx="audioCtx"
+    />
+    <!-- <p>{{emergency}}</p> -->
+    <!-- <ul v-if="data"> -->
+    <!--   <li v-for="train in data.trains">  -->
+    <!--     <RouterLink :to="`train-list/${train.id}`"> -->
+    <!--       id: {{train.id}}, 現在位置：{{train.read_id}} -->
+    <!--     </RouterLink> -->
+    <!--   </li> -->
+    <!-- </ul> -->
+  </div>
 </template>

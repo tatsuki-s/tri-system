@@ -21,28 +21,11 @@ onMounted(() =>{
   client.on('connect', () => {
     console.log("Connected")
     mqttData.value = client
-
-    //client?.subscribe('test/pico', (err: any) => {
-    //  if(!err){
-    //    console.log('subscribed')
-    //  }
-    //})
   })
-
-  //client.on('message', (topic: any, message: any) => {
-    // messageはBufferなので文字列に変換してパース
-  //  console.log(`Topic: ${topic}, Message: ${message.toString()}`)
-  //  try {
-  //    mqttData.value = JSON.parse(message.toString())
-  //  } catch (e) {
-  //    mqttData.value = message.toString()
-  //  }
-  //})
 
   client.on('error', (err: any) => {
     console.error('MQTT Connection Error:', err)
   })
-
 
 })
 
