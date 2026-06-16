@@ -8,6 +8,7 @@ interface EmergencyData{
   sender: string
 }
 
+
 const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)()
 const emergencyButton = ref<InstanceType<typeof AudioBuzzer> | null>(null)
 
@@ -16,13 +17,13 @@ const data = inject<any>("mqttData")
 
 const trains = ref("---")
 const emergency = ref<EmergencyData | null>(null)
-const topics = ["test/pico", "emergency"]
+const topics = ["trains", "emergency"]
 
 const handleMessage = (receivedTopic: string, msg: any) => {
   const rawData = msg.toString()
   console.log(rawData)
   switch(receivedTopic) {
-    case "test/pico":
+    case "trains":
       trains.value = rawData
       break
     case "emergency":
@@ -50,8 +51,7 @@ watch(() => data?.value, (newData) => {
     newData.subscribe(topics)
     newData.on("message", handleMessage)
   }
-  },{
-  immediate: true}
+  },{immediate: true}
   )
 
 onUnmounted(() => {

@@ -96,7 +96,7 @@ defineExpose({
 <template>
   <div class="buzzer-card">
     <!-- <h3>{{ title }}</h3> -->
-    <p class="spec">({{ frequency }}Hz / 間隔: {{ intervalMs }}ms)</p>
+    <!-- <p class="spec">({{ frequency }}Hz / 間隔: {{ intervalMs }}ms)</p> -->
     
     <button class="start-btn" @click="button">鳴らす/止める</button>
     <!-- <button class="stop-btn" @click="stopAlert">止める</button> -->
