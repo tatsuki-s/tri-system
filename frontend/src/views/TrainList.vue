@@ -3,64 +3,30 @@ import { inject, watch, ref, onUnmounted } from "vue"
 import { RouterLink } from "vue-router"
 import AudioBuzzer from "./asetts/AudioBuzzer.vue"
 
-interface EmergencyData{
-  status: number,
-  sender: string
-}
 
 
 const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)()
 const emergencyButton = ref<InstanceType<typeof AudioBuzzer> | null>(null)
 
-// ユーザーが最初に画面のどこかをクリックした時にAudioContextを初期化する（ブラウザ制限対策）
-const data = inject<any>("mqttData")
+//const data = inject<any>("mqttData")
 
-const trains = ref("^^")
-const emergency = ref<EmergencyData | null>(null)
-const topics = ["trains", "emergency"]
-
-const handleMessage = (receivedTopic: string, msg: any) => {
-  const rawData = msg.toString()
-  console.log(rawData)
-  switch(receivedTopic) {
-    case "trains":
-      trains.value = JSON.parse(rawData)
-      break
-    case "emergency":
-      emergency.value = JSON.parse(rawData)
-      if (emergency.value){
-        try{
-          if (emergency.value.status === 1){
-            emergencyButton.value?.startAlert()
-          }
-          else if (emergency.value.status === 0){
-            emergencyButton.value?.stopAlert()
-          }
-        }
-        catch{
-          console.log("gomi")
-        }
+const trains = inject<any>("trains")
+const emergency = inject<any>("emergency")
+watch(() => emergency?.value, (newData) => {
+  if (newData.value){
+    try{
+      if (newData.value.status === 1){
+        emergencyButton.value?.startAlert()
       }
-      break
-  }
-}
-
-watch(() => data?.value, (newData) => {
-  if (newData) {
-    newData.off("message", handleMessage)
-    newData.subscribe(topics)
-    newData.on("message", handleMessage)
-  }
-  },{immediate: true}
-  )
-
-onUnmounted(() => {
-  if(data?.value) {
-    data.value.unsubscribe(topics)
-    data.value.off("message", handleMessage)
+      else if (newData.value.status === 0){
+        emergencyButton.value?.stopAlert()
+      }
+    }
+    catch{
+      console.log("gomi")
+    }
   }
 })
-
 </script>
 <template>
   <div>
@@ -77,10 +43,10 @@ onUnmounted(() => {
     <p>{{emergency}}</p>
     <ul v-if="trains">
       <li v-for="train in trains"> 
-        train
-        <!-- <RouterLink :to="`train-list/${train.id}`"> -->
-        <!--   id: {{train.id}}, 現在位置：{{train.read_id}} -->
-        <!-- </RouterLink> -->
+        <!-- {{train}} -->
+        <RouterLink :to="`train-list/${train.id}`">
+          id: {{train.id}}, 現在位置：{{train.position}}
+        </RouterLink>
       </li>
     </ul>
   </div>
