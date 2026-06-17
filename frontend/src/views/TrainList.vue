@@ -15,7 +15,7 @@ const emergencyButton = ref<InstanceType<typeof AudioBuzzer> | null>(null)
 // ユーザーが最初に画面のどこかをクリックした時にAudioContextを初期化する（ブラウザ制限対策）
 const data = inject<any>("mqttData")
 
-const trains = ref("---")
+const trains = ref("^^")
 const emergency = ref<EmergencyData | null>(null)
 const topics = ["trains", "emergency"]
 
@@ -24,7 +24,7 @@ const handleMessage = (receivedTopic: string, msg: any) => {
   console.log(rawData)
   switch(receivedTopic) {
     case "trains":
-      trains.value = rawData
+      trains.value = JSON.parse(rawData)
       break
     case "emergency":
       emergency.value = JSON.parse(rawData)
@@ -63,7 +63,7 @@ onUnmounted(() => {
 
 </script>
 <template>
-  <!-- <div> -->
+  <div>
     <!-- <p>{{data}}</p> -->
     <h1>車両一覧</h1>
     <p>{{trains}}</p>
@@ -74,13 +74,14 @@ onUnmounted(() => {
         :interval-ms="100"
         :audio-ctx="audioCtx"
     />
-    <!-- <p>{{emergency}}</p> -->
-    <!-- <ul v-if="data"> -->
-    <!--   <li v-for="train in data.trains">  -->
-    <!--     <RouterLink :to="`train-list/${train.id}`"> -->
-    <!--       id: {{train.id}}, 現在位置：{{train.read_id}} -->
-    <!--     </RouterLink> -->
-    <!--   </li> -->
-    <!-- </ul> -->
-  <!-- </div> -->
+    <p>{{emergency}}</p>
+    <ul v-if="trains">
+      <li v-for="train in trains"> 
+        train
+        <!-- <RouterLink :to="`train-list/${train.id}`"> -->
+        <!--   id: {{train.id}}, 現在位置：{{train.read_id}} -->
+        <!-- </RouterLink> -->
+      </li>
+    </ul>
+  </div>
 </template>
