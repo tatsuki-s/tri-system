@@ -11,14 +11,16 @@ const emergencyButton = ref<InstanceType<typeof AudioBuzzer> | null>(null)
 //const data = inject<any>("mqttData")
 
 const trains = inject<any>("trains")
+
 const emergency = inject<any>("emergency")
-watch(() => emergency?.value, (newData) => {
-  if (newData.value){
+watch(emergency, (newData) => {
+  if (newData){
     try{
-      if (newData.value.status === 1){
+      console.log(newData)
+      if (newData.status === 1){
         emergencyButton.value?.startAlert()
       }
-      else if (newData.value.status === 0){
+      else if (newData.status === 0){
         emergencyButton.value?.stopAlert()
       }
     }
@@ -26,7 +28,7 @@ watch(() => emergency?.value, (newData) => {
       console.log("gomi")
     }
   }
-})
+},{deep: true, immediate: true})
 </script>
 <template>
   <div>

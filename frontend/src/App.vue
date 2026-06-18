@@ -19,7 +19,7 @@ provide("emergency", emergency)
 
 const handleMessage = (receivedTopic: string, msg: any) => {
   const rawData = msg.toString()
-  console.log(rawData)
+  console.log("生データ:",rawData)
   switch(receivedTopic) {
     case "trains":
       trains.value = JSON.parse(rawData)
@@ -31,20 +31,8 @@ const handleMessage = (receivedTopic: string, msg: any) => {
 }
 
 const topics = ["emergency", "trains"]
-watch(() => mqttData?.value, (newData) => {
-  if (newData) {
-    newData.off("message", handleMessage)
-    newData.subscribe(topics)
-    newData.on("message", handleMessage)
-  }
-  },{immediate: true}
-  )
-
-
 
 let client: mqtt.MqttClient | null = null
-
-//provide('mqttData', mqttData)
 
 onMounted(() =>{
   const url = `ws://${mqttUrl}:${mqttPort}`
@@ -57,7 +45,18 @@ onMounted(() =>{
 
   client.on('connect', () => {
     console.log("Connected")
-    mqttData.value = client
+    if (client) {
+      client.subscribe(topics, (err) => {
+        if(!err){
+          console.log(`topics: ${topics.join(', ')}`)
+        }
+        else{
+          console.error(err)
+        }
+      })
+      client.off("message", handleMessage)
+      client.on("message", handleMessage)
+    }
   })
 
   client.on('close', () => {
