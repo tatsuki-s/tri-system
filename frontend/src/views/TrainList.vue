@@ -3,12 +3,8 @@ import { inject, watch, ref} from "vue"
 import { RouterLink } from "vue-router"
 import AudioBuzzer from "@/components/AudioBuzzer.vue"
 
-
-
 const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)()
 const emergencyButton = ref<InstanceType<typeof AudioBuzzer> | null>(null)
-
-//const data = inject<any>("mqttData")
 
 const trains = inject<any>("trains")
 

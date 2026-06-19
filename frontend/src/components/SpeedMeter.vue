@@ -36,11 +36,11 @@
     ATCLimP_update( newValue.lim )
   })
 
-  watch(()=>props.data.lim , (newValue,oldValue)=>{
-    if (props.data.atc){
+//  watch(()=>props.data.lim , (newValue,oldValue)=>{
+    //if (props.data.atc){
       // ATCLimSpeedUpdate?.play()
-    }
-  })
+//    }
+  //})
   
   let isAni = false
   const speed_update = ( start:number , end:number ) => {
