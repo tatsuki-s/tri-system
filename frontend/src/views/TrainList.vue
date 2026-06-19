@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { inject, watch, ref} from "vue"
 import { RouterLink } from "vue-router"
-import AudioBuzzer from "./asetts/AudioBuzzer.vue"
+import AudioBuzzer from "@/components/AudioBuzzer.vue"
 
 
 
