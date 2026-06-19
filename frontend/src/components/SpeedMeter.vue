@@ -43,7 +43,7 @@
   })
   
   let isAni = false
-  function speed_update( start:number , end:number ){
+  const speed_update = ( start:number , end:number ) => {
     if(!hari.value||isAni){return}
     isAni = true
     start=(start/1.5)-120
@@ -57,7 +57,7 @@
     },).onfinish = ()=>{isAni = false}
   }
   
-  function ATCLimP_update(lim:number){
+  const ATCLimP_update = (lim:number) => {
     if(!ATC.value){return}
     lim=(lim/1.5)-120
     ATC.value.animate(
