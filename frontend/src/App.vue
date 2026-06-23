@@ -12,6 +12,19 @@ interface EmergencyData{
   sender: string
 }
 
+interface TrainData{
+  id: number,
+  speed: number,
+  limit: number,
+  position: number,
+  direction: number,
+  mc: number
+}
+
+interface Trains{
+  trains: TrainData[]
+}
+
 const trains = ref<any>(null)
 const emergency = ref<EmergencyData | null>(null)
 provide("trains", trains)
