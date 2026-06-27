@@ -1,10 +1,17 @@
 <script setup lang="ts">
-import { ref, inject } from "vue"
+import { ref, inject, computed } from "vue"
+import { useRoute } from "vue-router"
 import SpeedMeter from "@/components/SpeedMeter.vue"
 import { type TRIReceivedTrainData, TRIReceivedTrainDataDefault } from "@/types/TRITypes"
 const trains = inject<any>("trains")
-const ReceivedData = ref<TRIReceivedTrainData>({...TRIReceivedTrainDataDefault})
+//const ReceivedData = ref<TRIReceivedTrainData>({...TRIReceivedTrainDataDefault})
+const route = useRoute()
+const ReceivedData = computed(() => {
+  return trains.value.find(t => t.id.toString() === route.params.id)
+})
 const clock = ref(false)
+//ReceivedData.value = 
+
 </script>
 <template>
   <div>
@@ -12,7 +19,7 @@ const clock = ref(false)
     <div id="main" v-for="train in trains">
       <div v-if="train.id.toString() === $route.params.id"
         id="MainMonitor">
-        <p>{{train}}</p>
+        <!-- <p>{{train}}</p> -->
         <SpeedMeter
           id="SpeedMeter"
           :data="ReceivedData", 

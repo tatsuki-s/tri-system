@@ -34,6 +34,8 @@
   watch(()=>props.data , ( newValue , oldValue )=>{
     speed_update( oldValue.speed , newValue.speed)
     ATCLimP_update( newValue.lim )
+  },{
+  deep: true
   })
 
 //  watch(()=>props.data.lim , (newValue,oldValue)=>{
