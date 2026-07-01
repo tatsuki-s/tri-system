@@ -106,14 +106,14 @@ async def mqtt_task():
             msg = "Hellllllo {}"
             client.publish(TOPIC, msg.encode())
             await asyncio.sleep(2)
-    except Exeption as e:
+    except Exception as e:
         print(e)
 
     await asyncio.sleep(0.1)
 
 async def main():
     while True:
-        asyncio.gather(
+        await asyncio.gather(
             drive(MAX_DUTY),
             #,で追加
             mqtt_task()
