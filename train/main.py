@@ -112,11 +112,10 @@ async def mqtt_task():
     await asyncio.sleep(0.1)
 
 async def main():
-    while True:
-        await asyncio.gather(
-            drive(MAX_DUTY),
-            #,で追加
-            mqtt_task()
-        )
+    await asyncio.gather(
+        drive(MAX_DUTY),
+        #,で追加
+        mqtt_task()
+    )
 
 asyncio.run(main())
