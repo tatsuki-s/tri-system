@@ -2,6 +2,7 @@ import machine
 import network
 import uasyncio as asyncio
 from umqtt.simple import MQTTClient
+import config
 
 FORWARD_PIN = 6
 REVERSE_PIN = 7
@@ -17,9 +18,9 @@ VOLUME = [0, 1200, 2400, 5000, 6100, 8500, 11000, 13000, 15000, 17000, 19000, 60
 # NOTCH = [4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -6]
 # ノッチに対する1mminあたりのdutyの増加量(stepになる)
 MOTER_STEP = [400, 300, 200, 100, 0, -100, -200, -300, -400, -500, -1500]
-WIFI_SSID = ""
-WIFI_PASS = ""
-MQTT_BROKER = ""
+WIFI_SSID = config.WIFI_SSID
+WIFI_PASS = config.WIFI_PASS
+MQTT_BROKER = config.MQTT_BROKER
 CLIENT_ID = "PicoW_Client0"
 TOPIC = b"test/pico"
 
