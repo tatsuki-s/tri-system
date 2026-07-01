@@ -21,44 +21,30 @@ MOTER_STEP = [400, 300, 200, 100, 0, -100, -200, -300, -400, -500, -1500]
 WIFI_SSID = config.WIFI_SSID
 WIFI_PASS = config.WIFI_PASS
 MQTT_BROKER = config.MQTT_BROKER
-CLIENT_ID = "PicoW_Client0"
-TOPIC = b"test/pico"
+CLIENT_ID = 0
+TOPIC = b"trains" #暫定。今後"trains/CLIENT_ID"となる予定
 
 wlan = network.WLAN(network.STA_IF)
 wlan.active(True)
-wlan.connect(WIFI_SSID, WIFI_PASS)
+client = MQTTClient(CLIENT_ID, MQTT_BROKER)
 
-adc = machine.ADC(ADC_PIN)
-forward = machine.Pin(FORWARD_PIN,machine.Pin.IN,machine.Pin.PULL_UP)
-reverse = machine.Pin(REVERSE_PIN,machine.Pin.IN,machine.Pin.PULL_UP)
-# reverse = False
-pwm = machine.PWM(machine.Pin(PWM_PIN))
-pwm.freq(2000)
-# Falseで正転，Trueで逆転
-now_direc = False
-direc = machine.Pin(DIR_PIN, machine.Pin.OUT)
-prev_direc = None
-
-duty = 0
-step = 0
-
-def generate_step(mc):
-    for i in range(len(VOLUME)-1):
-        if VOLUME[i] < mc < VOLUME[i+1]:
-            return MOTER_STEP[i]
-    return 0
-
-def get_direction():
-    if reverse.value() == 0 and forward.value() == 1:
-        return False
-    elif reverse.value() == 1 and forward.value() == 0:
-        return True
-    else:
-        return None
-
-now_direc = get_direction()
+mqtt_data = {
+    "id": CLIENT_ID,
+    "speed": 0,
+    "limit": 0,
+    "position": 0, # UART経由で今後実装
+    "direction": True,
+    "mc": 0
+    }
 
 async def drive(limit_duty):
+    global mqtt_data
+    adc = machine.ADC(ADC_PIN)
+    forward = machine.Pin(FORWARD_PIN,machine.Pin.IN,machine.Pin.PULL_UP)
+    reverse = machine.Pin(REVERSE_PIN,machine.Pin.IN,machine.Pin.PULL_UP)
+    # reverse = False
+    pwm = machine.PWM(machine.Pin(PWM_PIN))
+    pwm.freq(2000)
     # Falseで正転，Trueで逆転
     now_direc = False
     direc = machine.Pin(DIR_PIN, machine.Pin.OUT)
@@ -66,6 +52,23 @@ async def drive(limit_duty):
 
     duty = 0
     step = 0
+
+    def generate_step(mc):
+        for i in range(len(VOLUME)-1):
+            if VOLUME[i] < mc < VOLUME[i+1]:
+                return MOTER_STEP[i]
+        return 0
+
+    def get_direction():
+        if reverse.value() == 0 and forward.value() == 1:
+            return False
+        elif reverse.value() == 1 and forward.value() == 0:
+            return True
+        else:
+            return None
+
+    now_direc = get_direction()
+
     while True:
         mc_value = adc.read_u16()
         vol_step = generate_step(mc_value)
@@ -96,21 +99,28 @@ async def drive(limit_duty):
         pwm.duty_u16(duty)
         
         print(generate_step(mc_value), now_direc, duty, mc_value)
+        mqtt_data["speed"] = generate_step(mc_value)
+        mqtt_data["direction"] = now_direc 
+        mqtt_data["mc"] = mc_value
+        # mqtt_data = generate_step(mc_value)
         await asyncio.sleep(0.08)
 
 async def mqtt_task():
+    global mqtt_data
+    if not wlan.isconnected():
+        wlan.connect(WIFI_SSID, WIFI_PASS)
+        while not wlan.isconnected():
+            await asyncio.sleep(1)
+ 
     try:
-        client = MQTTClient(CLIENT_ID, MQTT_BROKER)
         client.connect()
-        
         while True:
-            msg = "Hellllllo {}"
-            client.publish(TOPIC, msg.encode())
-            await asyncio.sleep(2)
+            client.publish(TOPIC, str([mqtt_data]).encode()) #[]で囲っているのは暫定
+            await asyncio.sleep(1)
     except Exception as e:
         print(e)
 
-    await asyncio.sleep(0.1)
+    await asyncio.sleep(0.5)
 
 async def main():
     await asyncio.gather(
