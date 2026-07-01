@@ -106,20 +106,32 @@ async def drive(limit_duty):
 
 async def mqtt_task():
     global mqtt_data
-    if not wlan.isconnected():
-        wlan.connect(WIFI_SSID, WIFI_PASS)
-        while not wlan.isconnected():
-            await asyncio.sleep(1)
- 
-    try:
-        client.connect()
-        while True:
-            client.publish(TOPIC, str([mqtt_data]).encode()) #[]で囲っているのは暫定
-            await asyncio.sleep(1)
-    except Exception as e:
-        print(e)
+    is_connected = False
 
-    await asyncio.sleep(0.5)
+    while True:
+        if not wlan.isconnected():
+            wlan.connect(WIFI_SSID, WIFI_PASS)
+            while not wlan.isconnected():
+                await asyncio.sleep(1)
+            is_connected = False
+
+        #mqttの再接続
+        if not is_connected:
+            try:
+                client.connect()
+                is_connected = True
+            except Exception as e:
+                print("mqtt error", e)
+                await asyncio.sleep(1)
+                continue
+        try:
+                client.publish(TOPIC, str([mqtt_data]).encode()) #[]で囲っているのは暫定
+                await asyncio.sleep(1)
+        except Exception as e:
+            print("送信エラー", e)
+            is_connected = False
+
+        await asyncio.sleep(0.5)
 
 async def main():
     await asyncio.gather(
