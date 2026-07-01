@@ -102,7 +102,6 @@ async def drive(limit_duty):
         mqtt_data["speed"] = generate_step(mc_value)
         mqtt_data["direction"] = now_direc 
         mqtt_data["mc"] = mc_value
-        # mqtt_data = generate_step(mc_value)
         await asyncio.sleep(0.08)
 
 async def mqtt_task():
