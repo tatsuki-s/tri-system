@@ -2,7 +2,8 @@ FROM node:23 AS base
 
 WORKDIR /frontend
 
-COPY ./package*.json ./
+COPY ./package.json ./
+RUN ls -la
 RUN npm install
 
 COPY . .
