@@ -1,21 +1,18 @@
 import cv2
+import serial
 import asyncio
-import websockets
-import json
 
-USE_WS = True
-TRAIN_ID = 2
+ser = serial.Serial("/dev/serial0", baudrate=9600, timeout=1)
 
-data = {
-    "type": "camera",
-    "data": {
-        "id": TRAIN_ID,
-        "status": "connected",
-        "read_id": None
-        }
-    }
-
-result_json = json.dumps({"data": data})
+def uart_send(data):
+    try:
+        if not ser.is_open:
+            ser.open()
+        send_data = f"{data}\n"
+        ser.write(send_data.encode("utf-8"))
+        print(data)
+    except Exception as e:
+        print(e)
 
 class ArUcoProcess:
     def __init__(self, threshold=3):
@@ -66,60 +63,46 @@ class ArUcoProcess:
             else:
                 self.count = 0
             self.prev = ans
+        else:
+            self.prev = None
+            self.cont = 0
 
 async def main():
 
-    name = "shoumenshoutotsu"
-    video_path = f"videos/{name}.mp4"
-    url = "ws://localhost:8000/ws"
-    ws = None
-    connect_wait = 300
-    count = connect_wait
     # カメラの開始 (0番は通常インカメ)
-    cap = cv2.VideoCapture(video_path)
+    cap = cv2.VideoCapture(0)
     processor = ArUcoProcess(threshold=3)
 
-    while True:
-        if USE_WS and ws == None and count >= connect_wait:
-            print("接続します")
-            count = 0
-            try:
-                ws = await websockets.connect(url)
-                data["data"]["status"] = "connected"
-                await ws.send(json.dumps(data))
-                print("接続成功")
-            except Exception as e:
-                print("接続失敗", e)
-        ret, frame = cap.read()
+    try:
+        while True:
+            ret, frame = cap.read()
 
-        if not ret:
-            print("終了")
-            break
+            if not ret:
+                print("終了")
+                break
 
-        result = processor.frame_process(frame)
-        if result is not None:
-            print("読み取り成功：", result)
+            result = processor.frame_process(frame)
+            if result is not None:
+                print("読み取り成功：", result)
 
-            if ws:
                 try:
-                    data["data"]["read_id"] = result
-                    await ws.send(json.dumps(data))
-                    print("送信成功", data)
+                    uart_send(result)
+                    print("送信成功", result)
                 except Exception as e:
                     print("error", e)
-                    ws = None
 
-        # 画面表示
-        # cv2.imshow('Kiha 110 Safety System', frame)
+            # 画面表示
+            # cv2.imshow('Kiha 110 Safety System', frame)
 
-        # 'q'キーで終了
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+            # 'q'キーで終了
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
 
-        count += 1
-        await asyncio.sleep(0.01)
-
-    cap.release()
-    cv2.destroyAllWindows()
+            await asyncio.sleep(0.01)
+    finally:
+        cap.release()
+        cv2.destroyAllWindows()
+        if ser.is_open:
+            ser.close()
 
 asyncio.run(main())

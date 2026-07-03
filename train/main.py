@@ -27,6 +27,8 @@ WIFI_PASS = config.WIFI_PASS
 CLIENT_ID = "0"
 TOPIC = b"trains" #暫定。今後"trains/CLIENT_ID"となる予定
 
+uart = machine.UART(0, baudrate=9600, tx=machine.Pin(0), rx=machine.Pin(1), timeout=10)
+
 wlan = network.WLAN(network.STA_IF)
 wlan.active(True)
 # mconf["ssid"] = config.WIFI_SSID
@@ -108,8 +110,8 @@ async def drive(limit_duty):
 
         pwm.duty_u16(duty)
         
-        print(generate_step(mc_value), now_direc, duty, mc_value)
-        mqtt_data["speed"] = duty
+        # print(generate_step(mc_value), now_direc, duty, mc_value)
+        mqtt_data["speed"] = duty // 200
         mqtt_data["direction"] = now_direc 
         mqtt_data["mc"] = generate_step(mc_value)
         await asyncio.sleep(0.08)
@@ -157,12 +159,24 @@ async def mqtt_task():
             led.off()
         await asyncio.sleep(0.5)
 
+async def receive_uart():
+    global mqtt_data, uart
+    while True:
+        if uart.any():
+            try:
+                data = uart.readline().decode("utf-8").strip()
+                mqtt_data["position"] = int(data)
+            except Exception as e:
+                print(e)
+        await asyncio.sleep(0.3)
+
 async def main():
     wlan.connect(WIFI_SSID, WIFI_PASS)
     await asyncio.gather(
         drive(MAX_DUTY),
         #,で追加
-        mqtt_task()
+        mqtt_task(),
+        receive_uart()
     )
 
 asyncio.run(main())
