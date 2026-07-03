@@ -17,7 +17,7 @@ interface TrainData{
   speed: number,
   limit: number,
   position: number,
-  direction: number,
+  direction: boolean,
   mc: number
 }
 

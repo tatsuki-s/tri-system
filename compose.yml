@@ -1,4 +1,6 @@
 # 本番用ではなく，デバッグ用
+include:
+  - path: ./server/compose.yml
 services:
   frontend:
     image: node:23

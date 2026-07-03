@@ -1,4 +1,5 @@
 import machine
+import json
 import gc
 import network
 import uasyncio as asyncio
@@ -117,16 +118,17 @@ async def mqtt_task():
     global mqtt_data, is_connected
     is_connected = False
     # await client.connect()
+    led = machine.Pin("LED", machine.Pin.OUT)
 
     while True:
         print(wlan.isconnected(), is_connected, gc.mem_free(), wlan.status())
         if not wlan.isconnected():
             is_connected = False
             wlan.connect(WIFI_SSID, WIFI_PASS)
-            for _ in range(5):
+            for _ in range(20):
                 if wlan.isconnected():
                     break
-                await asyncio.sleep(0.1)
+                await asyncio.sleep(0.5)
             if not wlan.isconnected():
                 await asyncio.sleep(1)
                 continue
@@ -143,15 +145,20 @@ async def mqtt_task():
                 await asyncio.sleep(5)
                 continue
         try:
-            await client.publish(TOPIC, str([mqtt_data]).encode()) #[]で囲っているのは暫定
+            await client.publish(TOPIC, json.dumps([mqtt_data]).encode()) #[]で囲っているのは暫定
             # await asyncio.sleep(5)
         except Exception as e:
             print("送信エラー", e)
             is_connected = False
 
+        if is_connected:
+            led.on()
+        else:
+            led.off()
         await asyncio.sleep(0.5)
 
 async def main():
+    wlan.connect(WIFI_SSID, WIFI_PASS)
     await asyncio.gather(
         drive(MAX_DUTY),
         #,で追加
