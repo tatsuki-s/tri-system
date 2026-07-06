@@ -25,7 +25,9 @@ WIFI_SSID = config.WIFI_SSID
 WIFI_PASS = config.WIFI_PASS
 # MQTT_BROKER = config.MQTT_BROKER
 CLIENT_ID = "0"
-TOPIC = b"trains" #暫定。今後"trains/CLIENT_ID"となる予定
+PUB_TOPIC = b"train"
+READ_TOPIC = f"train/${CLIENT_ID}/limit"
+
 
 uart = machine.UART(0, baudrate=9600, tx=machine.Pin(0), rx=machine.Pin(1), timeout=10)
 
@@ -44,11 +46,12 @@ is_connected = False
 mqtt_data = {
     "id": CLIENT_ID,
     "speed": 0,
-    "limit": 0,
+    # "limit": 0,
     "position": 0, # UART経由で今後実装
     "direction": True,
     "mc": 0
     }
+limit = 0
 
 async def drive(limit_duty):
     global mqtt_data
@@ -116,7 +119,12 @@ async def drive(limit_duty):
         mqtt_data["mc"] = generate_step(mc_value)
         await asyncio.sleep(0.08)
 
-async def mqtt_task():
+#受信処理
+# async def mqtt_read():
+#     global limit
+
+#送信処理
+async def mqtt_send():
     global mqtt_data, is_connected
     is_connected = False
     # await client.connect()
@@ -131,7 +139,7 @@ async def mqtt_task():
             led.on()
             #mqttの再接続
             try:
-                await client.publish(TOPIC, json.dumps([mqtt_data]).encode()) #[]で囲っているのは暫定
+                await client.publish(PUB_TOPIC, json.dumps(mqtt_data).encode()) #[]で囲っているのは暫定
                 # await asyncio.sleep(5)
             except Exception as e:
                 print("送信エラー", e)
@@ -157,9 +165,11 @@ async def main():
     except Exception as e:
         print(e)
     await asyncio.gather(
-        drive(MAX_DUTY),
+
+        drive(MAX_DUTY), #ここの引数は将来的にlimitになる
         #,で追加
-        mqtt_task(),
+        mqtt_send(),
+        # mqtt_read(),
         receive_uart()
     )
 

@@ -30,7 +30,7 @@ trains = {
         "mc": 0
     }
 }   
-topics = [("trains", 0), ("train/0", 0), ("train/1", 0), ("train/2", 0), ("map", 0)]
+topics = [("train/0", 0), ("train/1", 0), ("train/2", 0), ("map", 0), ("train/+/limit")]
 
 def on_connect(client, data, flags, rc):
     print("connected")
@@ -42,13 +42,19 @@ def on_message(client, data, msg):
         payload = json.loads(msg.payload)
         if msg.topic == "map":
             pass
-        if msg.topic == "trains":
-            for i in range(3):
-                client.publish(f"train/{i}", json.dumps(payload[i]))
+        # if msg.topic == "trains":
+            # for i in range(3):
+            #     client.publish(f"train/{i}", json.dumps(payload[i]))
         if msg.topic.startswith("train/"):
-            train_id = msg.topic.split("/")[1]
-            
-            trains[int(train_id)] = payload
+            train_id = int(msg.topic.split("/")[1])
+
+            if msg.topic.endswith("/limit"):
+                trains[train_id]["limit"] = payload.get("limit", 0)
+            else:
+                trains[train_id]["speed"] = payload.get("speed", 0)
+                trains[train_id]["position"] = payload.get("position", None)
+                trains[train_id]["direction"] = payload.get("speed", 0)
+                trains[train_id]["mc"] = payload.get("mc", False)
 
             client.publish("trains", json.dumps([trains[i] for i in range(3)])) 
     except Exception as e:
