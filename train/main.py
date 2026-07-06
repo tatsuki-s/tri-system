@@ -29,10 +29,10 @@ TOPIC = b"trains" #暫定。今後"trains/CLIENT_ID"となる予定
 
 uart = machine.UART(0, baudrate=9600, tx=machine.Pin(0), rx=machine.Pin(1), timeout=10)
 
-wlan = network.WLAN(network.STA_IF)
-wlan.active(True)
-# mconf["ssid"] = config.WIFI_SSID
-# mconf["wifi_pw"] = config.WIFI_PASS
+# wlan = network.WLAN(network.STA_IF)
+# wlan.active(True)
+mconf["ssid"] = config.WIFI_SSID
+mconf["wifi_pw"] = config.WIFI_PASS
 mconf["server"] = config.MQTT_BROKER
 mconf["client_id"] = CLIENT_ID
 mconf["keepalive"] = 60
@@ -67,7 +67,7 @@ async def drive(limit_duty):
 
     def generate_step(mc):
         for i in range(len(VOLUME)-1):
-            if VOLUME[i] < mc < VOLUME[i+1]:
+            if VOLUME[i] <= mc < VOLUME[i+1]:
                 return MOTER_STEP[i]
         return 0
 
@@ -122,42 +122,23 @@ async def mqtt_task():
     # await client.connect()
     led = machine.Pin("LED", machine.Pin.OUT)
 
+    while not client._has_connected:
+        await asyncio.sleep(0.5)
+
     while True:
-        print(wlan.isconnected(), is_connected, gc.mem_free(), wlan.status())
-        if not wlan.isconnected():
-            is_connected = False
-            wlan.connect(WIFI_SSID, WIFI_PASS)
-            for _ in range(20):
-                if wlan.isconnected():
-                    break
-                await asyncio.sleep(0.5)
-            if not wlan.isconnected():
-                await asyncio.sleep(1)
-                continue
-            # while not wlan.isconnected():
-                # await asyncio.sleep(5)
-
-        #mqttの再接続
-        if not is_connected:
-            try:
-                await client.connect()
-                is_connected = True
-            except Exception as e:
-                print("mqtt error", e)
-                await asyncio.sleep(5)
-                continue
-        try:
-            await client.publish(TOPIC, json.dumps([mqtt_data]).encode()) #[]で囲っているのは暫定
-            # await asyncio.sleep(5)
-        except Exception as e:
-            print("送信エラー", e)
-            is_connected = False
-
-        if is_connected:
+        # print(wlan.isconnected(), is_connected, gc.mem_free(), wlan.status())
+        if client._has_connected:
             led.on()
+            #mqttの再接続
+            try:
+                await client.publish(TOPIC, json.dumps([mqtt_data]).encode()) #[]で囲っているのは暫定
+                # await asyncio.sleep(5)
+            except Exception as e:
+                print("送信エラー", e)
+                is_connected = False
         else:
             led.off()
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(1.0)
 
 async def receive_uart():
     global mqtt_data, uart
@@ -171,7 +152,10 @@ async def receive_uart():
         await asyncio.sleep(0.3)
 
 async def main():
-    wlan.connect(WIFI_SSID, WIFI_PASS)
+    try:
+        await client.connect()
+    except Exception as e:
+        print(e)
     await asyncio.gather(
         drive(MAX_DUTY),
         #,で追加
