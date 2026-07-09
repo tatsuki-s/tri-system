@@ -30,7 +30,7 @@ trains = {
         "mc": 0
     }
 }   
-topics = [("train/0", 0), ("train/1", 0), ("train/2", 0), ("map", 0), ("train/+/limit")]
+topics = [("train/0", 0), ("train/1", 0), ("train/2", 0), ("map", 0), ("train/+/limit", 0)]
 
 def on_connect(client, data, flags, rc):
     print("connected")

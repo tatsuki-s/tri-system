@@ -46,6 +46,14 @@ const handleMessage = (receivedTopic: string, msg: any) => {
 const topics = ["emergency", "trains"]
 
 let client: mqtt.MqttClient | null = null
+provide("mqttPublish", (topic: string, message: string, qos: 0 | 1 | 2 = 0) => {
+  if(client){
+    client.publish(topic, message, {qos})
+  }
+  else{
+    console.log("未接続")
+  }
+})
 
 onMounted(() =>{
   const url = `ws://${mqttUrl}:${mqttPort}`

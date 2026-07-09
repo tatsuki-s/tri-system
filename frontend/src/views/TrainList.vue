@@ -7,13 +7,14 @@ const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)
 const emergencyButton = ref<InstanceType<typeof AudioBuzzer> | null>(null)
 
 const trains = inject<any>("trains")
-
 const emergency = inject<any>("emergency")
+const mqttPublish = inject<any>("mqttPublish")
 watch(emergency, (newData) => {
   if (newData){
     try{
       console.log(newData)
       if (newData.status === 1){
+        console.log("Ring!")
         emergencyButton.value?.startAlert()
       }
       else if (newData.status === 0){
@@ -37,6 +38,7 @@ watch(emergency, (newData) => {
         :frequency="2600"
         :interval-ms="100"
         :audio-ctx="audioCtx"
+        @click='mqttPublish("emergency", JSON.stringify({"status": true, "sender": "front"}), 0)'   
     />
     <p>{{emergency}}</p>
     <ul v-if="trains">
