@@ -32,6 +32,9 @@ trains = {
 }   
 topics = [("train/0", 0), ("train/1", 0), ("train/2", 0), ("map", 0), ("train/+/limit", 0)]
 
+with open("data/maps.json", "r", encoding="utf-8") as f:
+    MAPS_DATA = json.load(f)
+
 def on_connect(client, data, flags, rc):
     print("connected")
     client.subscribe(topics)
@@ -42,9 +45,6 @@ def on_message(client, data, msg):
         payload = json.loads(msg.payload)
         if msg.topic == "map":
             pass
-        # if msg.topic == "trains":
-            # for i in range(3):
-            #     client.publish(f"train/{i}", json.dumps(payload[i]))
         if msg.topic.startswith("train/"):
             train_id = int(msg.topic.split("/")[1])
 
@@ -66,3 +66,4 @@ client.on_connect = on_connect
 client.on_message = on_message 
 client.connect(BROKER, port, 60)
 client.loop_forever()
+f.close()
