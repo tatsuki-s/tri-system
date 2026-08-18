@@ -4,7 +4,7 @@ import { RouterView } from 'vue-router'
 import  mqtt from 'mqtt'
 
 const mqttData = ref<any>(null)
-const mqttUrl = import.meta.env.MQTT_HOST || "localhost"
+const mqttUrl = import.meta.env.VITE_MQTT_HOST || "localhost"
 const mqttPort = 9001
 
 interface EmergencyData{
