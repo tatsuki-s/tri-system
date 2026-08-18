@@ -6,5 +6,5 @@ services:
       - "1883:1883"
       - "9001:9001" # WebSockets用
     volumes:
-      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:Z
 
