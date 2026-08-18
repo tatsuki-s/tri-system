@@ -9,16 +9,19 @@ const emergencyButton = ref<InstanceType<typeof AudioBuzzer> | null>(null)
 const trains = inject<any>("trains")
 const emergency = inject<any>("emergency")
 const mqttPublish = inject<any>("mqttPublish")
+let isEmergency: Boolean = false
 watch(emergency, (newData) => {
   if (newData){
     try{
       console.log(newData)
-      if (newData.status === 1){
+      if (newData.status === true){
         console.log("Ring!")
+        isEmergency = true
         emergencyButton.value?.startAlert()
       }
-      else if (newData.status === 0){
+      else if (newData.status === false){
         emergencyButton.value?.stopAlert()
+        isEmergency = false
       }
     }
     catch{
@@ -38,7 +41,7 @@ watch(emergency, (newData) => {
         :frequency="2600"
         :interval-ms="100"
         :audio-ctx="audioCtx"
-        @click='mqttPublish("emergency", JSON.stringify({"status": true, "sender": "front"}), 0)'   
+        @click='isEmergency = !isEmergency; mqttPublish("emergency", JSON.stringify({"status": isEmergency, "sender": "front"}), 0)'   
     />
     <p>{{emergency}}</p>
     <ul v-if="trains">
