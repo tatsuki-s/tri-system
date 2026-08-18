@@ -1,8 +1,13 @@
 #加工サーバー用ファイル
 import json
 import paho.mqtt.client as mqtt
+from dotenv import load_dotenv
+import os
 
-BROKER = "localhost"
+load_dotenv()
+
+BROKER = os.getenv("BROKER")
+print(BROKER)
 port = 1883
 trains = {
     0: {
@@ -41,6 +46,7 @@ def on_connect(client, data, flags, rc):
 
 def on_message(client, data, msg):
     global trains
+    print("onMessage!")
     try:
         payload = json.loads(msg.payload)
         if msg.topic == "map":

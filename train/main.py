@@ -25,8 +25,8 @@ WIFI_SSID = config.WIFI_SSID
 WIFI_PASS = config.WIFI_PASS
 # MQTT_BROKER = config.MQTT_BROKER
 CLIENT_ID = "0"
-PUB_TOPIC = b"train"
-READ_TOPIC = f"train/${CLIENT_ID}/limit"
+PUB_TOPIC = f"train/{CLIENT_ID}"
+READ_TOPIC = f"train/{CLIENT_ID}/limit"
 
 
 uart = machine.UART(0, baudrate=9600, tx=machine.Pin(0), rx=machine.Pin(1), timeout=10)
