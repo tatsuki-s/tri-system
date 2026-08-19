@@ -38,6 +38,7 @@ mconf["wifi_pw"] = config.WIFI_PASS
 mconf["server"] = config.MQTT_BROKER
 mconf["client_id"] = CLIENT_ID
 mconf["keepalive"] = 60
+mconf["queue_len"] = 1 
 
 client = MQTTClient(mconf)
 client.DEBUG = True
@@ -126,8 +127,14 @@ async def drive(limit_duty):
         await asyncio.sleep(0.08)
 
 #受信処理
-# async def mqtt_read():
-#     global limit
+async def mqtt_read():
+    global limit
+    async for topic, msg, retained in client.queue:
+        try:
+            data = json.loads(msg)
+            print("受信:", topic, data)
+        except Exception as e:
+            print("受信処理エラー:", e)
 
 #送信処理
 async def mqtt_send():
@@ -166,6 +173,13 @@ async def receive_uart():
                 print(e)
         await asyncio.sleep(0.3)
 
+async def mqtt_subscribe_on_reconnect():
+    while True:
+        await client.up.wait()
+        client.up.clear()
+        print("mqtt接続確立。subscribeします。")
+        await client.subscribe(READ_TOPIC, 0)
+
 async def main():
     try:
         await client.connect(quick=True)
@@ -176,7 +190,8 @@ async def main():
         drive(MAX_DUTY), #ここの引数は将来的にlimitになる
         #,で追加
         mqtt_send(),
-        # mqtt_read(),
+        mqtt_read(),
+        mqtt_subscribe_on_reconnect(),
         receive_uart()
     )
 
