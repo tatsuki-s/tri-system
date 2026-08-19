@@ -178,7 +178,7 @@ async def receive_uart():
 
 async def main():
     try:
-        await client.connect()
+        await client.connect(quick=True)
     except Exception as e:
         print(e)
     await asyncio.gather(
