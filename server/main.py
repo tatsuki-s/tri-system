@@ -60,7 +60,7 @@ def on_message(client, data, msg):
             else:
                 trains[train_id]["speed"] = payload.get("speed", 0)
                 trains[train_id]["position"] = payload.get("position", None)
-                trains[train_id]["direction"] = payload.get("speed", 0)
+                trains[train_id]["direction"] = payload.get("direction", 0)
                 trains[train_id]["mc"] = payload.get("mc", False)
 
             client.publish("trains", json.dumps([trains[i] for i in range(3)])) 
