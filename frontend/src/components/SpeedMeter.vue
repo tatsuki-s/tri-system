@@ -20,7 +20,7 @@
     console.log("meter Mounted")
     alertSound = new Audio(Alert)
     ATCLimSpeedUpdate = new Audio(ATCSound)
-    // ATCLimSpeedUpdate.volume = 1
+    ATCLimSpeedUpdate.volume = 1
     // forwardAlert = new Audio("sounds/forward-Alert.mp3")
   })
   const props = defineProps<{
@@ -33,16 +33,18 @@
 
   watch(()=>props.data , ( newValue , oldValue )=>{
     speed_update( oldValue.speed , newValue.speed)
-    ATCLimP_update( newValue.lim )
+    ATCLimP_update( newValue.limit )
   },{
   deep: true
   })
 
-//  watch(()=>props.data.lim , (newValue,oldValue)=>{
-    //if (props.data.atc){
-      // ATCLimSpeedUpdate?.play()
-//    }
-  //})
+//  watch(
+//    ()=>props.data.limit ,
+//      (newValue, oldValue)=>{
+//        if (props.data.atc){
+//          ATCLimSpeedUpdate?.play()
+//        }
+//  })
   
   let isAni = false
   const speed_update = ( start:number , end:number ) => {
@@ -81,7 +83,7 @@
   <div style="position: relative; align-items: center;" @click="trainAlert" >
     <img :src="speed_base" style="width: 100%; margin: auto;" class="main" >
     <img :src="hari_img"  class="main" ref="hari" style="margin:auto">
-    <img :src="atc_limPoint"  class="main" ref="ATC" v-show="data.atc" style="margin: auto;">
+    <img :src="atc_limPoint"  class="main" ref="ATC" style="margin: auto;">
     <img :src="ATCNextLim" class="main" style="margin: auto;" ref="NextLim" v-show="props.data.forwardAlert && props.clock">
     <img :src="mainLine" class="sub" v-if="props.clock&&false">
     <img :src="directionLine_OFF" class="sub" v-else>
