@@ -12,6 +12,7 @@ REVERSE_PIN = 7
 PWM_PIN = 2
 DIR_PIN = 3
 ADC_PIN = 26
+EMERGENCY_PIN = 8
 
 MAX_DUTY = 65000
 
@@ -48,6 +49,7 @@ mconf["keepalive"] = 60
 client = MQTT_base(mconf)
 client.DEBUG = True
 is_connected = False
+is_emergency = False
 
 mqtt_data = {
     "id": CLIENT_ID,
@@ -60,7 +62,7 @@ mqtt_data = {
 limit = 0
 
 async def drive(limit_duty):
-    global mqtt_data
+    global mqtt_data, is_emergency
     adc = machine.ADC(ADC_PIN)
     forward = machine.Pin(FORWARD_PIN,machine.Pin.IN,machine.Pin.PULL_UP)
     reverse = machine.Pin(REVERSE_PIN,machine.Pin.IN,machine.Pin.PULL_UP)
@@ -70,6 +72,7 @@ async def drive(limit_duty):
     now_direc = False
     direc = machine.Pin(DIR_PIN, machine.Pin.OUT)
     # prev_direc = None
+    emergency = machine.Pin(EMERGENCY_PIN,machine.Pin.IN,machine.Pin.PULL_UP)
 
     duty = 0
     step = 0
@@ -94,6 +97,10 @@ async def drive(limit_duty):
         mc_value = adc.read_u16()
         vol_step = generate_step(mc_value)
         switch_direc = get_direction()
+
+        if emergency.value() == 0:
+            is_emergency = True
+            print("EMERGENCY!")
         
         if (switch_direc != now_direc) or (switch_direc is None):
             if duty > 0:
@@ -131,10 +138,11 @@ async def drive(limit_duty):
 
 #送信処理
 async def mqtt_send():
-    global mqtt_data, is_connected
+    global mqtt_data, is_connected, is_emergency
     is_connected = False
     # await client.connect()
     led = machine.Pin("LED", machine.Pin.OUT)
+    emergency_data = {"status": True, "sender": f"train{mqtt_data["id"]}" }
 
     while not client._has_connected:
         await asyncio.sleep(0.5)
@@ -146,6 +154,9 @@ async def mqtt_send():
             #mqttの再接続
             try:
                 await client.publish(PUB_TOPIC, json.dumps(mqtt_data).encode()) #[]で囲っているのは暫定
+                if is_emergency:
+                    await client.publish("emergency", json.dumps(emergency_data).encode()) 
+                    is_emergency = False
                 # await asyncio.sleep(5)
             except Exception as e:
                 print("送信エラー", e)
