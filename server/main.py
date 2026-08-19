@@ -35,7 +35,7 @@ trains = {
         "mc": 0
     }
 }   
-topics = [("train/0", 0), ("train/1", 0), ("train/2", 0), ("map", 0), ("train/+/limit", 0)]
+topics = [("train/0", 0), ("train/1", 0), ("train/2", 0), ("map", 0), ("train/+/limit", 0), ("emergency", 1)]
 
 with open("data/maps.json", "r", encoding="utf-8") as f:
     MAPS_DATA = json.load(f)
@@ -43,6 +43,13 @@ with open("data/maps.json", "r", encoding="utf-8") as f:
 def on_connect(client, data, flags, rc):
     print("connected")
     client.subscribe(topics)
+
+def update_limit(limit):
+    for train_id in trains:
+        trains[train_id]["limit"] = limit
+
+    for i in range(len(trains)):
+        client.publish(f"train/{i}/limit", limit)
 
 def on_message(client, data, msg):
     global trains
@@ -64,6 +71,14 @@ def on_message(client, data, msg):
                 trains[train_id]["mc"] = payload.get("mc", False)
 
             client.publish("trains", json.dumps([trains[i] for i in range(3)])) 
+        if msg.topic == "emergency":
+            print(payload)
+            is_emergency = payload.get("status", True)
+            if is_emergency:
+                update_limit(0)
+            else:
+                update_limit(300)
+
     except Exception as e:
         print("json parse error", e)
 
