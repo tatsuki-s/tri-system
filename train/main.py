@@ -4,7 +4,7 @@ import gc
 import network
 import uasyncio as asyncio
 # from umqtt.simple import MQTTClient
-from mqtt_as import MQTT_base, config as mconf
+from mqtt_as import MQTTClient, config as mconf
 import config
 
 FORWARD_PIN = 6
@@ -46,7 +46,7 @@ mconf["server"] = config.MQTT_BROKER
 mconf["client_id"] = CLIENT_ID
 mconf["keepalive"] = 60
 
-client = MQTT_base(mconf)
+client = MQTTClient(mconf)
 client.DEBUG = True
 is_connected = False
 is_emergency = False
