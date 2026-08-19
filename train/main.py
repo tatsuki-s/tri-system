@@ -15,16 +15,14 @@ ADC_PIN = 26
 
 MAX_DUTY = 65000
 
-# 範囲を指定
-VOLUME = [0, 1200, 2400, 5000, 6100, 8500, 11000, 13000, 15000, 17000, 19000, 60000]
-# マスコンとしての値
-# NOTCH = [4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -6]
-# ノッチに対する1mminあたりのdutyの増加量(stepになる)
-MOTER_STEP = [400, 300, 200, 100, 0, -100, -200, -300, -400, -500, -1500]
 WIFI_SSID = config.WIFI_SSID
 WIFI_PASS = config.WIFI_PASS
 # MQTT_BROKER = config.MQTT_BROKER
-CLIENT_ID = "0"
+
+VOLUME = config.VOLUME
+MOTER_STEP = config.MOTER_STEP
+
+CLIENT_ID = config.CLIENT_ID
 PUB_TOPIC = f"train/{CLIENT_ID}"
 READ_TOPIC = f"train/{CLIENT_ID}/limit"
 
