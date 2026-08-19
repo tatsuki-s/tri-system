@@ -8,8 +8,8 @@ import config
 
 FORWARD_PIN = 6
 REVERSE_PIN = 7
-PWM_PIN = 2
-DIR_PIN = 3
+PWM_PIN = 3
+DIR_PIN = 2
 ADC_PIN = 26
 EMERGENCY_PIN = 8
 
@@ -55,8 +55,8 @@ mqtt_data = {
     }
 limit = 0
 
-async def drive(limit_duty):
-    global mqtt_data, is_emergency
+async def drive():
+    global mqtt_data, is_emergency, limit
     adc = machine.ADC(ADC_PIN)
     forward = machine.Pin(FORWARD_PIN,machine.Pin.IN,machine.Pin.PULL_UP)
     reverse = machine.Pin(REVERSE_PIN,machine.Pin.IN,machine.Pin.PULL_UP)
@@ -91,11 +91,13 @@ async def drive(limit_duty):
         mc_value = adc.read_u16()
         vol_step = generate_step(mc_value)
         switch_direc = get_direction()
+        limit_duty = min(limit * 200, MAX_DUTY)
 
         if emergency.value() == 0:
             is_emergency = True
             print("EMERGENCY!")
         
+        print(duty, limit)
         if (switch_direc != now_direc) or (switch_direc is None):
             if duty > 0:
                 step = -2000
@@ -116,7 +118,9 @@ async def drive(limit_duty):
         if duty < 0:
             duty = 0
         if duty > limit_duty:
-            duty = limit_duty
+            duty -= 2000
+            if duty < limit_duty:
+                duty = limit_duty
 
         pwm.duty_u16(duty)
         
@@ -133,6 +137,7 @@ async def mqtt_read():
         try:
             data = json.loads(msg)
             print("受信:", topic, data)
+            limit = int(data)
         except Exception as e:
             print("受信処理エラー:", e)
 
@@ -160,6 +165,7 @@ async def mqtt_send():
                 is_connected = False
         else:
             led.off()
+        print(limit)
         await asyncio.sleep(1.0)
 
 async def receive_uart():
@@ -187,7 +193,7 @@ async def main():
         print(e)
     await asyncio.gather(
 
-        drive(MAX_DUTY), #ここの引数は将来的にlimitになる
+        drive(),
         #,で追加
         mqtt_send(),
         mqtt_read(),
