@@ -73,7 +73,9 @@ async def drive():
 
     def generate_step(mc):
         for i in range(len(VOLUME)-1):
-            if VOLUME[i] <= mc < VOLUME[i+1]:
+            low = min(VOLUME[i], VOLUME[i+1])
+            high = max(VOLUME[i], VOLUME[i+1])
+            if low <= mc < high:
                 return MOTER_STEP[i]
         return 0
 
