@@ -3,7 +3,6 @@ import json
 import gc
 import network
 import uasyncio as asyncio
-# from umqtt.simple import MQTTClient
 from mqtt_as import MQTTClient, config as mconf
 import config
 
@@ -30,16 +29,10 @@ READ_TOPIC = f"train/{CLIENT_ID}/limit"
 
 uart = machine.UART(0, baudrate=9600, tx=machine.Pin(0), rx=machine.Pin(1), timeout=10)
 
-wlan = network.WLAN(network.STA_IF)
-wlan.active(True)
-wlan.connect(config.WIFI_SSID, config.WIFI_PASS)
+# wlan = network.WLAN(network.STA_IF)
+# wlan.active(True)
+# wlan.connect(config.WIFI_SSID, config.WIFI_PASS)
     
-import time
-while not wlan.isconnected():
-    print("waiting for wifi...")
-    time.sleep(1)
-print("wifi connected:", wlan.ifconfig())
-
 mconf["ssid"] = config.WIFI_SSID
 mconf["wifi_pw"] = config.WIFI_PASS
 mconf["server"] = config.MQTT_BROKER
@@ -143,9 +136,6 @@ async def mqtt_send():
     # await client.connect()
     led = machine.Pin("LED", machine.Pin.OUT)
     emergency_data = {"status": True, "sender": f"train{mqtt_data["id"]}" }
-
-    while not client._has_connected:
-        await asyncio.sleep(0.5)
 
     while True:
         # print(wlan.isconnected(), is_connected, gc.mem_free(), wlan.status())
