@@ -44,6 +44,9 @@ def on_connect(client, data, flags, rc):
     print("connected")
     client.subscribe(topics)
 
+    #最初のメッセージ
+    client.publish("map/now", json.dumps(MAPS_DATA))
+
 def update_limit(limit):
     for train_id in trains:
         trains[train_id]["limit"] = limit
@@ -88,4 +91,3 @@ client.on_connect = on_connect
 client.on_message = on_message 
 client.connect(BROKER, port, 60)
 client.loop_forever()
-f.close()
