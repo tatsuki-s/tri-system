@@ -35,7 +35,7 @@ trains = {
         "mc": 0
     }
 }   
-topics = [("train/0", 0), ("train/1", 0), ("train/2", 0), ("map/now", 0), ("train/+/limit", 0), ("emergency", 1)]
+topics = [("train/0", 0), ("train/1", 0), ("train/2", 0), ("train/+/limit", 0), ("emergency", 1)]
 
 with open("data/maps.json", "r", encoding="utf-8") as f:
     MAPS_DATA = json.load(f)
