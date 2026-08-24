@@ -1,23 +1,69 @@
-{	
-	"1":{
-		"map_id": 0,
-		"name": "直線",
-    "blocks":{
-      "2":{
-        "name": "第2閉塞",
-        "prev": [1],
-        "next": [0]
+[
+  {
+    "descrption": {
+      "id": "simple_straight",
+      "name": "シンプルな直線",
+      "loop": false
+    },
+
+    "blocks": [
+      {
+        "id": "B01",
+        "name": "1",
+        "position": {
+          "x": 100,
+          "y": 100
+        },
+        "speedLimit": 300
       },
-      "0":{
-        "name": "第1閉塞",
-        "prev": [2],
-        "next": [1]
+      {
+        "id": "B02",
+        "name": "2",
+        "position": {
+          "x": 100,
+          "y": 125
+        },
+        "speedLimit": 300
       },
-      "1":{
-        "name": "場内",
-        "prev": [0],
-        "next": [2]
+      {
+        "id": "B03",
+        "name": "3",
+        "position": {
+          "x": 100,
+          "y": 150
+        },
+        "speedLimit": 300
+      },
+      {
+        "id": "B04",
+        "name": "4",
+        "position": {
+          "x": 100,
+          "y": 175
+        },
+        "speedLimit": 300
       }
+    ],
+    "routes": [
+      {
+        "id": "R01",
+        "from": "B01",
+        "to": "B02"
+      },
+      {
+        "id": "R02",
+        "from": "B02",
+        "to": "B03"
+      },
+      {
+        "id": "R03",
+        "from": "B03",
+        "to": "B04"
+      }
+    ],
+
+    "settings": {
+      "defaultSpeedLimit": 40
     }
   }
-}
+]

@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@tailwindcss/forms": "^0.5.11",
+    "@vue-flow/core": "^1.48.2",
     "mqtt": "^5.15.1",
     "pinia": "^3.0.4",
     "vue": "^3.5.29",
