@@ -59,9 +59,6 @@ def on_message(client, data, msg):
     print("onMessage!")
     try:
         payload = json.loads(msg.payload)
-        if msg.topic == "map/now":
-            map_id = payload.id 
-            client.publish("map/now", json.dumps(MAPS_DATA[str(map_id)]), qos=1, retain=True)
         if msg.topic.startswith("train/"):
             train_id = int(msg.topic.split("/")[1])
 
