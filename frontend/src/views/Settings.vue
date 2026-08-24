@@ -67,24 +67,32 @@ const flowEdges = computed<Edge[]>(() => {
 
 </script>
 <template>
-  <p>現在：{{map_now}}</p>
-  <p>map：{{map_list}}</p>
-  <p>ここに閉塞設定画面</p>
-  <select
-    v-if="map_list"
-    v-model=map_now
-  >
-    <option disabled value=null>マップ変更時にテンプレートを選択</option>
-    <option
+  <!-- <p>現在：{{map_now}}</p> -->
+  <!-- <p>map：{{map_list}}</p> -->
+  <div id="select_map">
+    <p>ここに閉塞設定画面</p>
+    <select
+      v-if="map_list"
+      v-model=map_now
+    >
+      <option
+        disabled
+        value=null
+        class="map_list_dropdown"
+      >
+        マップ変更時にテンプレートを選択</option>
+      <option
+        class="map_list_dropdown"
         v-for="map_data in map_list"
         :key="map_data.description.id"
         :value="map_data"
-    >
-      {{map_data.description.name}}
-    </option>
-  </select>
-  <p v-else>マップデータが読み込まれていません</p>
-  <div style="width: 100%; height: 600px">
+      >
+        {{map_data.description.name}}
+      </option>
+    </select>
+    <p v-else>マップデータが読み込まれていません</p>
+  </div>
+  <div id="flow_map"">
     <VueFlow
       v-if="map_now"
       :nodes="flowNodes"
@@ -93,3 +101,17 @@ const flowEdges = computed<Edge[]>(() => {
     />
   </div>
 </template>
+<style scoped>
+#select_map{
+  width: 100%;
+  height: 10vh;
+}
+#flow_map{
+  width: 100%;
+  height: 95vh;
+  border: 1px solid black;
+}
+.map_list_dropdown{
+  height: 5vh;
+}
+</style>
