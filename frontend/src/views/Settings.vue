@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { inject } from "vue"
 import type { Node, Edge } from '@vue-flow/core'  
+import type { RailwayMap } from "@/types/map.ts"
 import { VueFlow } from '@vue-flow/core'
 
-const map_list = inject<any>("map_list")
-const map_now = inject<any>("map_now")
+const map_list = inject<[RailwayMap]>("map_list")
+const map_now = inject<RailwayMap>("map_now")
 
 </script>
 <template>
