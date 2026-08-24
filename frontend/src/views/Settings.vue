@@ -11,7 +11,10 @@ const map_now = inject<any>("map_now")
   <p>現在：{{map_now}}</p>
   <p>map：{{map_list}}</p>
   <p>ここに閉塞設定画面</p>
-  <select v-model=select_map>
+  <select
+    v-if="map_list"
+    v-model=select_map
+  >
     <option disabled value="">マップ変更時にテンプレートを選択</option>
     <option
         v-for="map_data in map_list"
@@ -21,4 +24,5 @@ const map_now = inject<any>("map_now")
       {{map_data.description.name}}
     </option>
   </select>
+  <p v-else>マップデータが読み込まれていません</p>
 </template>
