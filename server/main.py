@@ -35,7 +35,7 @@ trains = {
         "mc": 0
     }
 }   
-topics = [("train/0", 0), ("train/1", 0), ("train/2", 0), ("map", 0), ("train/+/limit", 0), ("emergency", 1)]
+topics = [("train/0", 0), ("train/1", 0), ("train/2", 0), ("map/now", 0), ("train/+/limit", 0), ("emergency", 1)]
 
 with open("data/maps.json", "r", encoding="utf-8") as f:
     MAPS_DATA = json.load(f)
@@ -45,7 +45,7 @@ def on_connect(client, data, flags, rc):
     client.subscribe(topics)
 
     #最初のメッセージ
-    client.publish("map/now", json.dumps(MAPS_DATA))
+    client.publish("map", json.dumps(MAPS_DATA), qos=1, retain=True)
 
 def update_limit(limit):
     for train_id in trains:
@@ -59,9 +59,9 @@ def on_message(client, data, msg):
     print("onMessage!")
     try:
         payload = json.loads(msg.payload)
-        if msg.topic == "map":
+        if msg.topic == "map/now":
             map_id = payload.id 
-            client.publish("map/now", MAPS_DATA[str(map_id)])
+            client.publish("map/now", json.dumps(MAPS_DATA[str(map_id)]), qos=1, retain=True)
         if msg.topic.startswith("train/"):
             train_id = int(msg.topic.split("/")[1])
 

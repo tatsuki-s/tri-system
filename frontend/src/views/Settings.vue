@@ -7,4 +7,5 @@ const map_now = inject<any>("map_now")
 <template>
   <p>ここに閉塞設定画面</p>
   <p>現在：{{map_now}}</p>
+  <p>map：{{map_list}}</p>
 </template>
