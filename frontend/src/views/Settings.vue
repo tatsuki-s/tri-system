@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { ref, inject } from "vue"
+import { inject } from "vue"
 import type { Node, Edge } from '@vue-flow/core'  
 import { VueFlow } from '@vue-flow/core'
 
-//const select_map = ref<any>("")
 const map_list = inject<any>("map_list")
 const map_now = inject<any>("map_now")
 
