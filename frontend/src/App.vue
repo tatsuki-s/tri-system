@@ -28,7 +28,7 @@ interface Trains{
 const trains = ref<Trains | null>(null)
 const emergency = ref<EmergencyData | null>(null)
 const map_list = ref<any>(null)
-const map_now = ref<any>(null)
+const map_now = ref<any>("")
 provide("trains", trains)
 provide("emergency", emergency)
 provide("map_list", map_list)
