@@ -25,10 +25,14 @@ interface Trains{
   trains: TrainData[]
 }
 
-const trains = ref<any>(null)
+const trains = ref<Trains | null>(null)
 const emergency = ref<EmergencyData | null>(null)
+const map_list = ref<any>(null)
+const map_now = ref<any>(null)
 provide("trains", trains)
 provide("emergency", emergency)
+provide("map_list", map_list)
+provide("map_now", map_now)
 
 const handleMessage = (receivedTopic: string, msg: any) => {
   const rawData = msg.toString()
@@ -40,10 +44,16 @@ const handleMessage = (receivedTopic: string, msg: any) => {
     case "emergency":
       emergency.value = JSON.parse(rawData)
       break
+    case "map":
+      map_list.value = JSON.parse(rawData)
+      break
+    case "map/now":
+      map_now.value = JSON.parse(rawData)
+      break
   }
 }
 
-const topics = ["emergency", "trains"]
+const topics = ["emergency", "trains", "map", "map/now"]
 
 let client: mqtt.MqttClient | null = null
 provide("mqttPublish", (topic: string, message: string, qos: 0 | 1 | 2 = 0) => {
