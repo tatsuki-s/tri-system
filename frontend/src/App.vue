@@ -56,9 +56,9 @@ const handleMessage = (receivedTopic: string, msg: any) => {
 const topics = ["emergency", "trains", "map", "map/now"]
 
 let client: mqtt.MqttClient | null = null
-provide("mqttPublish", (topic: string, message: string, qos: 0 | 1 | 2 = 0) => {
+provide("mqttPublish", (topic: string, message: string, qos: 0 | 1 | 2 = 0, retain: boolean = false) => {
   if(client){
-    client.publish(topic, message, {qos})
+    client.publish(topic, message, {qos, retain})
   }
   else{
     console.log("未接続")
