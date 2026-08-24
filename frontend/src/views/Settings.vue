@@ -25,4 +25,5 @@ const map_now = inject<any>("map_now")
     </option>
   </select>
   <p v-else>マップデータが読み込まれていません</p>
+
 </template>

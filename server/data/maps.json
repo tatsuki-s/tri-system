@@ -6,7 +6,7 @@
       "loop": false
     },
 
-    "blocks": [
+    "node": [
       {
         "id": "B01",
         "name": "1",
