@@ -63,7 +63,7 @@
     ],
 
     "settings": {
-      "defaultSpeedLimit": 40
+      "defaultLimit": 300
     }
   }
 ]
