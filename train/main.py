@@ -4,6 +4,8 @@ import gc
 import network
 import uasyncio as asyncio
 from mqtt_as import MQTTClient, config as mconf
+import time
+
 import config
 
 FORWARD_PIN = 6
@@ -44,6 +46,8 @@ WILDCARD_LIMIT = {
         47: { "limit": 0, "direction": "any" }
     }
 
+UART_TIMEOUT = 1.5
+
 uart = machine.UART(0, baudrate=9600, tx=machine.Pin(0), rx=machine.Pin(1), timeout=10)
 
 # wlan = network.WLAN(network.STA_IF)
@@ -71,6 +75,8 @@ mqtt_data = {
     "mc": 0
     }
 limit = 0
+
+uart_last_received = time.ticks_ms()
 
 async def drive():
     global mqtt_data, is_emergency, limit
@@ -112,10 +118,15 @@ async def drive():
         switch_direc = get_direction()
         limit_duty = min(limit * 200, MAX_DUTY)
 
-        if emergency.value() == 0:
+        elapsed = time.ticks_diff(
+            time.ticks_ms(),
+            uart_last_received
+        )
+        #非常停止ボタンが押されたまたはUARTが一定時間受信できなかったとき
+        if emergency.value() == 0 or elapsed > UART_TIMEOUT * 1000:
             is_emergency = True
             print("EMERGENCY!")
-        
+
         print(duty, limit)
         if (switch_direc != now_direc) or (switch_direc is None):
             if duty > 0:
@@ -202,9 +213,10 @@ def apply_wildcard_limit(value):
             client.publish(MQTT_LIMIT, json.dumps(limit).encode()) 
 
 async def receive_uart():
-    global mqtt_data, uart, limit
+    global mqtt_data, uart, limit, uart_last_received
     while True:
         if uart.any():
+            uart_last_received = time.ticks_ms()
             try:
                 data = int(uart.readline().decode("utf-8").strip())
                 if data <= 39:
