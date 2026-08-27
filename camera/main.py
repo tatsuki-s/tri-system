@@ -67,11 +67,9 @@ class ArUcoProcess:
             self.prev = None
             self.count = 0
 
-async def main():
-
+async def aruco_process(processor):
     # カメラの開始 (0番は通常インカメ)
     cap = cv2.VideoCapture(0)
-    processor = ArUcoProcess(threshold=3)
 
     try:
         while True:
@@ -104,5 +102,19 @@ async def main():
         cv2.destroyAllWindows()
         if ser.is_open:
             ser.close()
+
+async def uart_heartbeat(processor):
+    while True:
+        uart_send(processor.sent)
+        await asyncio.sleep(0.5)
+
+async def main():
+
+    processor = ArUcoProcess(threshold=3)
+
+    await asyncui.gather(
+            aruco_process(processor),
+            uart_heartbeat(processor)
+        )
 
 asyncio.run(main())
