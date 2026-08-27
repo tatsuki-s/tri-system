@@ -24,7 +24,7 @@ MOTER_STEP = config.MOTER_STEP
 
 CLIENT_ID = config.CLIENT_ID
 PUB_TOPIC = f"train/{CLIENT_ID}"
-READ_TOPIC = f"train/{CLIENT_ID}/limit"
+MQTT_LIMIT = f"train/{CLIENT_ID}/limit"
 
 UART_TIMEOUT = 0.5
 
@@ -191,12 +191,15 @@ def apply_wildcard_limit(value):
     global limit, mqtt_data
     if WILDCARD_LIMIT[value]["direction"] == "any":
         limit = WILDCARD_LIMIT[value]["limit"]
+        client.publish(MQTT_LIMIT, json.dumps(limit).encode()) 
     elif WILDCARD_LIMIT[value]["direction"] == "front":
-        if mqtt_data["direction"] = True:
+        if mqtt_data["direction"] == True:
             limit = WILDCARD_LIMIT[value]["limit"]
+            client.publish(MQTT_LIMIT, json.dumps(limit).encode()) 
     elif WILDCARD_LIMIT[value]["direction"] == "back":
-        if mqtt_data["direction"] = False:
+        if mqtt_data["direction"] == False:
             limit = WILDCARD_LIMIT[value]["limit"]
+            client.publish(MQTT_LIMIT, json.dumps(limit).encode()) 
 
 async def receive_uart():
     global mqtt_data, uart, limit
@@ -218,7 +221,7 @@ async def mqtt_subscribe_on_reconnect():
         await client.up.wait()
         client.up.clear()
         print("mqtt接続確立。subscribeします。")
-        await client.subscribe(READ_TOPIC, 0)
+        await client.subscribe(MQTT_LIMIT, 0)
 
 async def main():
     try:
