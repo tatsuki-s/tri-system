@@ -65,7 +65,7 @@ class ArUcoProcess:
             self.prev = ans
         else:
             self.prev = None
-            self.cont = 0
+            self.count = 0
 
 async def main():
 

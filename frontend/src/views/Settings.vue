@@ -73,7 +73,7 @@ const flowEdges = computed<Edge[]>(() => {
     <p>ここに閉塞設定画面</p>
     <select
       v-if="map_list"
-      v-model=map_now
+      v-model="map_now"
     >
       <option
         disabled
