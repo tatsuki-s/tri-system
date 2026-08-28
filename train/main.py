@@ -32,18 +32,18 @@ UART_TIMEOUT = 0.5
 
 WILDCARD_LIMIT = {
         #前進時のみ
-        40: { "limit": 0, "direction": "front" }
-        41: { "limit": 60, "direction": "front" }
-        42: { "limit": 120, "direction": "front" }
-        43: { "limit": 210, "direction": "front" }
-        44: { "limit": 300, "direction": "front" }
-        #後退時のみ
-        44: { "limit": 0, "direction": "back" }
-        45: { "limit": 60, "direction": "back" }
-        46: { "limit": 120, "direction": "back" }
-        47: { "limit": 300, "direction": "back" }
-        #いつでも
-        47: { "limit": 0, "direction": "any" }
+        40: { "limit": 0, "direction": "front" },
+        41: { "limit": 60, "direction": "front" },
+        42: { "limit": 120, "direction": "front" },
+        43: { "limit": 210, "direction": "front" },
+        44: { "limit": 300, "direction": "front" },
+        #後退時のみ                               
+        44: { "limit": 0, "direction": "back" }   ,
+        45: { "limit": 60, "direction": "back" }  ,
+        46: { "limit": 120, "direction": "back" } ,
+        47: { "limit": 300, "direction": "back" } ,
+        #いつでも                                
+        47: { "limit": 0, "direction": "any" }    ,
     }
 
 UART_TIMEOUT = 1.5
@@ -123,7 +123,8 @@ async def drive():
             uart_last_received
         )
         #非常停止ボタンが押されたまたはUARTが一定時間受信できなかったとき
-        if emergency.value() == 0 or elapsed > UART_TIMEOUT * 1000:
+        # if emergency.value() == 0 or elapsed > UART_TIMEOUT * 1000:
+        if emergency.value() == 0 :
             is_emergency = True
             print("EMERGENCY!")
 
