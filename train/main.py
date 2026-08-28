@@ -38,12 +38,12 @@ WILDCARD_LIMIT = {
         43: { "limit": 210, "direction": "front" },
         44: { "limit": 300, "direction": "front" },
         #後退時のみ                               
-        44: { "limit": 0, "direction": "back" }   ,
-        45: { "limit": 60, "direction": "back" }  ,
-        46: { "limit": 120, "direction": "back" } ,
-        47: { "limit": 300, "direction": "back" } ,
+        45: { "limit": 0, "direction": "back" }   ,
+        46: { "limit": 60, "direction": "back" }  ,
+        47: { "limit": 120, "direction": "back" } ,
+        48: { "limit": 300, "direction": "back" } ,
         #いつでも                                
-        47: { "limit": 0, "direction": "any" }    ,
+        49: { "limit": 0, "direction": "any" }    ,
     }
 
 UART_TIMEOUT = 1.5
