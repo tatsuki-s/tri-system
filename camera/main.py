@@ -18,7 +18,7 @@ class ArUcoProcess:
     def __init__(self, threshold=3):
         self.prev = None
         self.count = 0
-        self.sent = None
+        self.sent = -1
         self.threshold = 3
 
         # ArUcoの設定 (4x4の格子、50種類までのIDを使用する設定)
@@ -112,7 +112,7 @@ async def main():
 
     processor = ArUcoProcess(threshold=3)
 
-    await asyncui.gather(
+    await asyncio.gather(
             aruco_process(processor),
             uart_heartbeat(processor)
         )
