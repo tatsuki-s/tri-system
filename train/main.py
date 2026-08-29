@@ -28,24 +28,6 @@ CLIENT_ID = config.CLIENT_ID
 PUB_TOPIC = f"train/{CLIENT_ID}"
 MQTT_LIMIT = f"train/{CLIENT_ID}/limit"
 
-UART_TIMEOUT = 0.5
-
-WILDCARD_LIMIT = {
-        #前進時のみ
-        40: { "limit": 0, "direction": "front" },
-        41: { "limit": 60, "direction": "front" },
-        42: { "limit": 120, "direction": "front" },
-        43: { "limit": 210, "direction": "front" },
-        44: { "limit": 300, "direction": "front" },
-        #後退時のみ                               
-        45: { "limit": 0, "direction": "back" }   ,
-        46: { "limit": 60, "direction": "back" }  ,
-        47: { "limit": 120, "direction": "back" } ,
-        48: { "limit": 300, "direction": "back" } ,
-        #いつでも                                
-        49: { "limit": 0, "direction": "any" }
-    }
-
 UART_TIMEOUT = 1.5
 
 uart = machine.UART(0, baudrate=9600, tx=machine.Pin(0), rx=machine.Pin(1), timeout=10)
@@ -131,8 +113,6 @@ async def drive():
         print(duty, limit)
         #ディレクションスイッチの変更を検知
         if (switch_direc != now_direc) or (switch_direc is None):
-            #速度制限を解除
-            limit = MAX_DUTY // 200
             if duty > 0:
                 step = -2000
             else:
@@ -151,7 +131,7 @@ async def drive():
                 
         if duty < 0:
             duty = 0
-        if duty > limit_duty:
+        if duty > limit_duty or is_emergency:
             duty -= 2000
             if duty < limit_duty:
                 duty = limit_duty
@@ -202,21 +182,6 @@ async def mqtt_send():
         print(limit)
         await asyncio.sleep(1.0)
 
-def apply_wildcard_limit(value):
-    global limit, mqtt_data
-    if WILDCARD_LIMIT[value]["direction"] == "any":
-        limit = WILDCARD_LIMIT[value]["limit"]
-        client.publish(MQTT_LIMIT, json.dumps(limit).encode()) 
-    elif WILDCARD_LIMIT[value]["direction"] == "front":
-        if mqtt_data["direction"] == True:
-            limit = WILDCARD_LIMIT[value]["limit"]
-            client.publish(MQTT_LIMIT, json.dumps(limit).encode()) 
-    elif WILDCARD_LIMIT[value]["direction"] == "back":
-        if mqtt_data["direction"] == False:
-            limit = WILDCARD_LIMIT[value]["limit"]
-            client.publish(MQTT_LIMIT, json.dumps(limit).encode()) 
-    print("limit update")
-
 async def receive_uart():
     global mqtt_data, uart, limit, uart_last_received
     while True:
@@ -224,11 +189,7 @@ async def receive_uart():
             uart_last_received = time.ticks_ms()
             try:
                 data = int(uart.readline().decode("utf-8").strip())
-                if data <= 39:
-                    mqtt_data["position"] = data
-                else:
-                    apply_wildcard_limit(data)
-                    print("wildcard: ", WILDCARD_LIMIT[data])
+                mqtt_data["position"] = data
             except Exception as e:
                 print(e)
         await asyncio.sleep(0.3)
