@@ -129,7 +129,10 @@ async def drive():
             print("EMERGENCY!")
 
         print(duty, limit)
+        #ディレクションスイッチの変更を検知
         if (switch_direc != now_direc) or (switch_direc is None):
+            #速度制限を解除
+            limit = MAX_DUTY // 200
             if duty > 0:
                 step = -2000
             else:
