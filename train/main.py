@@ -183,7 +183,7 @@ async def mqtt_send():
         await asyncio.sleep(1.0)
 
 async def receive_uart():
-    global mqtt_data, uart, limit, uart_last_received
+    global mqtt_data, uart, uart_last_received
     while True:
         if uart.any():
             uart_last_received = time.ticks_ms()
