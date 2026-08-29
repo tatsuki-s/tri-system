@@ -43,7 +43,7 @@ WILDCARD_LIMIT = {
         47: { "limit": 120, "direction": "back" } ,
         48: { "limit": 300, "direction": "back" } ,
         #いつでも                                
-        49: { "limit": 0, "direction": "any" }    ,
+        49: { "limit": 0, "direction": "any" }
     }
 
 UART_TIMEOUT = 1.5
@@ -212,6 +212,7 @@ def apply_wildcard_limit(value):
         if mqtt_data["direction"] == False:
             limit = WILDCARD_LIMIT[value]["limit"]
             client.publish(MQTT_LIMIT, json.dumps(limit).encode()) 
+    print("limit update")
 
 async def receive_uart():
     global mqtt_data, uart, limit, uart_last_received
