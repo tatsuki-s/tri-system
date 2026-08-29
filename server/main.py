@@ -16,7 +16,8 @@ trains = {
         "limit": 0,
         "position": 0,
         "direction": True,
-        "mc": 0
+        "mc": 0,
+        "hazards": []
     },
     1: {
         "id": 1,
@@ -24,7 +25,8 @@ trains = {
         "limit": 0,
         "position": 0,
         "direction": True,
-        "mc": 0
+        "mc": 0,
+        "hazards": []
     },
     2: {
         "id": 2,
@@ -32,7 +34,8 @@ trains = {
         "limit": 0,
         "position": 0,
         "direction": True,
-        "mc": 0
+        "mc": 0,
+        "hazards": []
     }
 }   
 topics = [("train/0", 0), ("train/1", 0), ("train/2", 0), ("train/+/limit", 0), ("emergency", 1)]

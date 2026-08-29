@@ -3,7 +3,8 @@
     "description": {
       "id": "simple_straight",
       "name": "シンプルな直線",
-      "loop": false
+      "loop": false,
+      "default_hazards": [49, 46]
     },
 
     "nodes": [
