@@ -2,6 +2,7 @@
 import { onMounted, onUnmounted, ref, provide, watch } from 'vue'
 import { RouterView } from 'vue-router'
 import  mqtt from 'mqtt'
+import type RailwayMap from "@/types/map"
 
 const mqttData = ref<any>(null)
 const mqttUrl = import.meta.env.VITE_MQTT_HOST || "localhost"
@@ -27,7 +28,7 @@ interface Trains{
 
 const trains = ref<Trains | null>(null)
 const emergency = ref<EmergencyData | null>(null)
-const map_list = ref<any>(null)
+const map_list = ref<RailwayMap[] | null>(null)
 const map_now = ref<any>(null)
 provide("trains", trains)
 provide("emergency", emergency)

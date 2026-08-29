@@ -4,15 +4,20 @@ import type { Node, Edge } from '@vue-flow/core'
 import type { RailwayMap, MapNode } from "@/types/map.ts"
 import { VueFlow } from '@vue-flow/core'
 import '@vue-flow/core/dist/style.css'
+import BlockNode from "@/components/BlockNode.vue"
 
 const map_list = inject<RailwayMap[]>("map_list")
 const map_now = inject<Ref<RailwayMap | null>>("map_now")
+
+const nodeTypes = {
+  block: BlockNode
+}
 
 const createFlowNodes = (map: RailwayMap): Node[] => {
   return map.nodes.map((node) => ({
     id: node.id,
 
-    type: "default",
+    type: "block",
 
     position: node.position,
 
@@ -92,11 +97,12 @@ const flowEdges = computed<Edge[]>(() => {
     </select>
     <p v-else>マップデータが読み込まれていません</p>
   </div>
-  <div id="flow_map"">
+  <div id="flow_map">
     <VueFlow
       v-if="map_now"
       :nodes="flowNodes"
       :edges="flowEdges"
+      :node-types="nodeTypes"
       fit-view-on-init
     />
   </div>
