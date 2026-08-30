@@ -51,8 +51,7 @@ is_emergency = False
 mqtt_data = {
     "id": CLIENT_ID,
     "speed": 0,
-    # "limit": 0,
-    "position": 0, # UART経由で今後実装
+    "position": -1,
     "direction": True,
     "mc": 0
     }

@@ -14,7 +14,7 @@ trains = {
         "id": 0,
         "speed": 0,
         "limit": 0,
-        "position": 0,
+        "position": -1,
         "direction": True,
         "mc": 0,
         "hazards": []
@@ -23,7 +23,7 @@ trains = {
         "id": 1,
         "speed": 0,
         "limit": 0,
-        "position": 0,
+        "position": -1,
         "direction": True,
         "mc": 0,
         "hazards": []
@@ -32,7 +32,7 @@ trains = {
         "id": 2,
         "speed": 0,
         "limit": 0,
-        "position": 0,
+        "position": -1,
         "direction": True,
         "mc": 0,
         "hazards": []
