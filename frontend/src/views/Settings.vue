@@ -8,6 +8,7 @@ import BlockNode from "@/components/BlockNode.vue"
 
 const map_list = inject<RailwayMap[]>("map_list")
 const map_now = inject<Ref<RailwayMap | null>>("map_now")
+const mqttPublish = inject<any>("mqttPublish")
 
 const nodeTypes = {
   block: BlockNode
@@ -70,6 +71,11 @@ const flowEdges = computed<Edge[]>(() => {
   return createFlowEdges(map_now.value)
 })
 
+const selectMapTemplate = () => {
+  mqttPublish("map/now", JSON.stringify(map_now.value), 1, true)
+  console.log("map_now", JSON.stringify(map_now.value))
+}
+
 </script>
 <template>
   <!-- <p>現在：{{map_now}}</p> -->
@@ -79,6 +85,7 @@ const flowEdges = computed<Edge[]>(() => {
     <select
       v-if="map_list"
       v-model="map_now"
+      @change="selectMapTemplate"
     >
       <option
         disabled
