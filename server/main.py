@@ -82,6 +82,7 @@ def set_limits():
         for j, item in trains.items():
             if i != j:
                 data["hazards"].append(item["position"])
+                print(MAPS_DATA)
             print(item)
     print("update hazards", trains)
         
