@@ -53,12 +53,16 @@ trains = {
 topics = [("train/0", 0), ("train/1", 0), ("train/2", 0), ("train/+/limit", 0), ("emergency", 1), ("map/now", 0)]
 
 map_now = {}
+nodes = {}
+edges = {}
+node_edges = defaultdict(list)
 
 with open("data/maps.json", "r", encoding="utf-8") as f:
     MAPS_DATA = json.load(f)
 
 #現在のマップの状態を管理
 def build_graph(map_now):
+    global nodes, edges, node_edges
     nodes = {n["id"]: n for n in map_now["nodes"]}
     edges = {r["id"]: {**r} for r in map_now["routes"]}
     # print("node",nodes)
@@ -68,7 +72,12 @@ def build_graph(map_now):
         node_edges[e["from"]].append(e["id"])
         node_edges[e["to"]].append(e["id"])
     # print(node_edges)
-    return nodes, edges, node_edges
+
+#在線処理
+def on_train_process(train_id, prev_node, new_node):
+    if prev_node not in (None, -1):
+        pass
+
 
 def on_connect(client, data, flags, rc):
     print("connected")
@@ -83,16 +92,6 @@ def update_limit(limit):
 
     for i in range(len(trains)):
         client.publish(f"train/{i}/limit", limit)
-
-# def set_limits():
-#     #車両間隔が近いときの制限の適用
-#     for i, data in trains.items():
-#         for j, item in trains.items():
-#             if i != j:
-#                 print(MAPS_DATA)
-#             print(item)
-#     print("update hazards", trains)
-        
 
 def on_message(client, data, msg):
     global trains, map_now
