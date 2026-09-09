@@ -140,9 +140,11 @@ def on_message(client, data, msg):
                     if new_edge is not None:
                         trains[train_id]["now_edge"] = new_edge
                         #マップ側での在線位置を更新
-                        update_train_position(train_id, new_edge)
                     else:
+                        trains[train_id]["now_edge"] = None
                         print(f"train {train_id}: no edge between {now_node} -> {new_node}")
+
+                    update_train_position(train_id, new_edge)
                     trains[train_id]["position"] = new_node
 
 
