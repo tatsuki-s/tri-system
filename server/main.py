@@ -32,7 +32,6 @@ trains = {
         "position": -1,
         "direction": None,
         "mc": 0,
-        "hazards": []
     },
     1: {
         "id": 1,
@@ -41,7 +40,6 @@ trains = {
         "position": -1,
         "direction": None,
         "mc": 0,
-        "hazards": []
     },
     2: {
         "id": 2,
@@ -50,7 +48,6 @@ trains = {
         "position": -1,
         "direction": None,
         "mc": 0,
-        "hazards": []
     }
 }   
 topics = [("train/0", 0), ("train/1", 0), ("train/2", 0), ("train/+/limit", 0), ("emergency", 1), ("map/now", 0)]
@@ -125,7 +122,6 @@ def on_message(client, data, msg):
             else:
                 update_limit(300)
         if msg.topic == ("map/now"):
-            default_hazards = payload["description"]["default_hazards"] 
             map_now = json.loads(json.dumps(payload))
             # print("map_now:",  payload)
 
