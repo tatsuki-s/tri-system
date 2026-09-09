@@ -60,6 +60,7 @@ map_now = {}
 with open("data/maps.json", "r", encoding="utf-8") as f:
     MAPS_DATA = json.load(f)
 
+#現在のマップの状態を管理
 def build_graph(map_now):
     nodes = {n["id"]: n for n in map_now["nodes"]}
     edges = {r["id"]: {**r} for r in map_now["routes"]}
