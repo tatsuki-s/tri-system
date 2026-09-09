@@ -57,11 +57,6 @@ topics = [("train/0", 0), ("train/1", 0), ("train/2", 0), ("train/+/limit", 0), 
 with open("data/maps.json", "r", encoding="utf-8") as f:
     MAPS_DATA = json.load(f)
 
-def add_hazards(hazards):
-    for i, data in trains.items():
-        data["hazards"].append(hazards)
-    print(trains)
-
 def on_connect(client, data, flags, rc):
     print("connected")
     client.subscribe(topics)
@@ -115,7 +110,6 @@ def on_message(client, data, msg):
                 update_limit(300)
         if msg.topic == ("map/now"):
             default_hazards = payload["description"]["default_hazards"] 
-            add_hazards(default_hazards)
 
     except Exception as e:
         print("json parse error", e)
