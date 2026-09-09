@@ -100,8 +100,8 @@ def on_message(client, data, msg):
             else:
                 trains[train_id]["speed"] = payload.get("speed", 0)
                 trains[train_id]["position"] = payload.get("position", None)
-                trains[train_id]["direction"] = payload.get("direction", 0)
-                trains[train_id]["mc"] = payload.get("mc", False)
+                trains[train_id]["direction"] = payload.get("direction", None)
+                trains[train_id]["mc"] = payload.get("mc", 0)
 
             set_limits()
 
