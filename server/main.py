@@ -30,7 +30,7 @@ trains = {
         "speed": 0,
         "limit": 0,
         "position": -1,
-        "direction": True,
+        "direction": None,
         "mc": 0,
         "hazards": []
     },
@@ -39,7 +39,7 @@ trains = {
         "speed": 0,
         "limit": 0,
         "position": -1,
-        "direction": True,
+        "direction": None,
         "mc": 0,
         "hazards": []
     },
@@ -48,7 +48,7 @@ trains = {
         "speed": 0,
         "limit": 0,
         "position": -1,
-        "direction": True,
+        "direction": None,
         "mc": 0,
         "hazards": []
     }
