@@ -30,6 +30,7 @@ trains = {
         "speed": 0,
         "limit": 0,
         "position": -1,
+        "now_edge": None,
         "direction": None,
         "mc": 0,
     },
@@ -38,6 +39,7 @@ trains = {
         "speed": 0,
         "limit": 0,
         "position": -1,
+        "now_edge": None,
         "direction": None,
         "mc": 0,
     },
@@ -46,6 +48,7 @@ trains = {
         "speed": 0,
         "limit": 0,
         "position": -1,
+        "now_edge": None,
         "direction": None,
         "mc": 0,
     }
@@ -63,8 +66,12 @@ with open("data/maps.json", "r", encoding="utf-8") as f:
 #現在のマップの状態を管理
 def build_graph(map_now):
     global nodes, edges, node_edges
+
+    if not map_now:
+        return
+
     nodes = {n["id"]: n for n in map_now["nodes"]}
-    edges = {r["id"]: {**r} for r in map_now["routes"]}
+    edges = {r["id"]: {**r, "now_train": None} for r in map_now["routes"]}
     # print("node",nodes)
     # print("edge",edges)
     node_edges = defaultdict(list)
@@ -73,12 +80,24 @@ def build_graph(map_now):
         node_edges[e["to"]].append(e["id"])
     # print(node_edges)
 
+#edgeの値を更新
+def update_now_edge(train_id, old_edge, new_edge):
+    for edge in edges.values():
+        if edge["from"] == old_edge and edge["to"] == new_edge:
+            return edge["id"]
+
 #在線処理
-def on_train_process(train_id, prev_node, new_node):
-    if prev_node not in (None, -1):
-        pass
-
-
+def update_train_position(train_id, new_edge):
+    global edges, trains
+    #リセット
+    for edge in edges.values():
+        if edge["now_train"] == train_id:
+            edge["now_train"] = None
+            break
+    #新しい位置で配置
+    if new_edge is not None:
+        edges[new_edge]["now_train"] = train_id
+    
 def on_connect(client, data, flags, rc):
     print("connected")
     client.subscribe(topics)
@@ -96,6 +115,7 @@ def update_limit(limit):
 def on_message(client, data, msg):
     global trains, map_now
     print("onMessage!")
+    print(trains)
     try:
         payload = json.loads(msg.payload)
         if msg.topic.startswith("train/"):
@@ -105,12 +125,17 @@ def on_message(client, data, msg):
                 trains[train_id]["limit"] = payload.get("limit", 0)
             else:
                 trains[train_id]["speed"] = payload.get("speed", 0)
-                trains[train_id]["position"] = payload.get("position", None)
                 trains[train_id]["direction"] = payload.get("direction", None)
                 trains[train_id]["mc"] = payload.get("mc", 0)
-                build_graph(map_now)
 
-            #set_limits()
+                now_node = trains[train_id]["position"]
+                new_node = payload.get("position", -1)
+                new_edge = update_now_edge(train_id, now_node, new_node)
+                trains[train_id]["now_edge"] = new_edge
+                trains[train_id]["position"] = new_node
+
+                #マップ側での在線位置を更新
+                update_train_position(train_id, new_edge)
 
             client.publish("trains", json.dumps([trains[i] for i in range(3)])) 
         if msg.topic == "emergency":
@@ -122,6 +147,7 @@ def on_message(client, data, msg):
                 update_limit(300)
         if msg.topic == ("map/now"):
             map_now = json.loads(json.dumps(payload))
+            build_graph(map_now)
             # print("map_now:",  payload)
 
     except Exception as e:
