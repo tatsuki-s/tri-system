@@ -81,10 +81,13 @@ def build_graph(map_now):
     # print(node_edges)
 
 #edgeの値を更新
-def update_now_edge(train_id, old_edge, new_edge):
+def update_now_edge(old_edge, new_edge):
     for edge in edges.values():
         if edge["from"] == old_edge and edge["to"] == new_edge:
             return edge["id"]
+        if edge["from"] == new_edge and edge["to"] == old_edge:
+            return edge["id"]
+    return None
 
 #在線処理
 def update_train_position(train_id, new_edge):
@@ -115,7 +118,9 @@ def update_limit(limit):
 def on_message(client, data, msg):
     global trains, map_now
     print("onMessage!")
-    print(trains)
+    print("edge", edges)
+    print("node",nodes)
+    print("no_ed", node_edges)
     try:
         payload = json.loads(msg.payload)
         if msg.topic.startswith("train/"):
@@ -129,13 +134,17 @@ def on_message(client, data, msg):
                 trains[train_id]["mc"] = payload.get("mc", 0)
 
                 now_node = trains[train_id]["position"]
-                new_node = payload.get("position", -1)
-                new_edge = update_now_edge(train_id, now_node, new_node)
-                trains[train_id]["now_edge"] = new_edge
-                trains[train_id]["position"] = new_node
+                new_node = payload.get("position", None)
+                if new_node is not None and new_node != now_node:
+                    new_edge = update_now_edge(now_node, new_node)
+                    if new_edge is not None:
+                        trains[train_id]["now_edge"] = new_edge
+                        #マップ側での在線位置を更新
+                        update_train_position(train_id, new_edge)
+                    else:
+                        print(f"train {train_id}: no edge between {now_node} -> {new_node}")
+                    trains[train_id]["position"] = new_node
 
-                #マップ側での在線位置を更新
-                update_train_position(train_id, new_edge)
 
             client.publish("trains", json.dumps([trains[i] for i in range(3)])) 
         if msg.topic == "emergency":
