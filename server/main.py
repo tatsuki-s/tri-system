@@ -42,6 +42,8 @@ nodes = {}
 edges = {}
 node_edges = defaultdict(list)
 
+is_emergency = False
+
 with open("data/maps.json", "r", encoding="utf-8") as f:
     MAPS_DATA = json.load(f)
 
@@ -98,7 +100,7 @@ def update_limit(limit):
         client.publish(f"train/{i}/limit", limit)
 
 def on_message(client, data, msg):
-    global trains, map_now
+    global trains, map_now, is_emergency
     print("onMessage!")
     print("edge", edges)
     print("node",nodes)
