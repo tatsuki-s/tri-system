@@ -18,6 +18,7 @@ interface TrainData{
   speed: number,
   limit: number,
   position: number | null,
+  now_edge: string | null,
   direction: boolean,
   mc: number
 }
