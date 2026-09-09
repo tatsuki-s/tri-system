@@ -3,6 +3,7 @@ import json
 import paho.mqtt.client as mqtt
 from dotenv import load_dotenv
 import os
+from collections import defaultdict
 
 #車両間に応じた速度制限
 DISTANCE_LIMIT = {
@@ -54,8 +55,22 @@ trains = {
 }   
 topics = [("train/0", 0), ("train/1", 0), ("train/2", 0), ("train/+/limit", 0), ("emergency", 1), ("map/now", 0)]
 
+map_now = {}
+
 with open("data/maps.json", "r", encoding="utf-8") as f:
     MAPS_DATA = json.load(f)
+
+def build_graph(map_now):
+    nodes = {n["id"]: n for n in map_now["nodes"]}
+    edges = {r["id"]: {**r} for r in map_now["routes"]}
+    # print("node",nodes)
+    # print("edge",edges)
+    node_edges = defaultdict(list)
+    for e in edges.values():
+        node_edges[e["from"]].append(e["id"])
+        node_edges[e["to"]].append(e["id"])
+    # print(node_edges)
+    return nodes, edges, node_edges
 
 def on_connect(client, data, flags, rc):
     print("connected")
@@ -71,19 +86,18 @@ def update_limit(limit):
     for i in range(len(trains)):
         client.publish(f"train/{i}/limit", limit)
 
-def set_limits():
-    #車両間隔が近いときの制限の適用
-    for i, data in trains.items():
-        for j, item in trains.items():
-            if i != j:
-                data["hazards"].append(item["position"])
-                print(MAPS_DATA)
-            print(item)
-    print("update hazards", trains)
+# def set_limits():
+#     #車両間隔が近いときの制限の適用
+#     for i, data in trains.items():
+#         for j, item in trains.items():
+#             if i != j:
+#                 print(MAPS_DATA)
+#             print(item)
+#     print("update hazards", trains)
         
 
 def on_message(client, data, msg):
-    global trains
+    global trains, map_now
     print("onMessage!")
     try:
         payload = json.loads(msg.payload)
@@ -97,8 +111,9 @@ def on_message(client, data, msg):
                 trains[train_id]["position"] = payload.get("position", None)
                 trains[train_id]["direction"] = payload.get("direction", None)
                 trains[train_id]["mc"] = payload.get("mc", 0)
+                build_graph(map_now)
 
-            set_limits()
+            #set_limits()
 
             client.publish("trains", json.dumps([trains[i] for i in range(3)])) 
         if msg.topic == "emergency":
@@ -110,6 +125,8 @@ def on_message(client, data, msg):
                 update_limit(300)
         if msg.topic == ("map/now"):
             default_hazards = payload["description"]["default_hazards"] 
+            map_now = json.loads(json.dumps(payload))
+            # print("map_now:",  payload)
 
     except Exception as e:
         print("json parse error", e)
