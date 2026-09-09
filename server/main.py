@@ -25,33 +25,15 @@ BROKER = os.getenv("BROKER")
 print(BROKER)
 port = 1883
 trains = {
-    0: {
-        "id": 0,
+    i: {
+        "id": i,
         "speed": 0,
         "limit": 0,
         "position": -1,
         "now_edge": None,
         "direction": None,
         "mc": 0,
-    },
-    1: {
-        "id": 1,
-        "speed": 0,
-        "limit": 0,
-        "position": -1,
-        "now_edge": None,
-        "direction": None,
-        "mc": 0,
-    },
-    2: {
-        "id": 2,
-        "speed": 0,
-        "limit": 0,
-        "position": -1,
-        "now_edge": None,
-        "direction": None,
-        "mc": 0,
-    }
+    } for i in range(3)
 }   
 topics = [("train/0", 0), ("train/1", 0), ("train/2", 0), ("train/+/limit", 0), ("emergency", 1), ("map/now", 0)]
 
