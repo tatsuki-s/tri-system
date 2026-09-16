@@ -58,17 +58,14 @@ with open("data/maps.json", "r", encoding="utf-8") as f:
     MAPS_DATA = json.load(f)
 
 #現在のマップの状態を管理
-def build_graph(map_now):
-    nodes = {n["id"]: n for n in map_now["nodes"]}
-    edges = {r["id"]: {**r} for r in map_now["routes"]}
-    # print("node",nodes)
-    # print("edge",edges)
-    node_edges = defaultdict(list)
-    for e in edges.values():
-        node_edges[e["from"]].append(e["id"])
-        node_edges[e["to"]].append(e["id"])
-    # print(node_edges)
-    return nodes, edges, node_edges
+def build_graph(map_now, trains):
+    return {
+        key: {
+            **value,
+            "status": None
+        }
+        for key, value in data["map"].items()
+    }
 
 def on_connect(client, data, flags, rc):
     print("connected")
