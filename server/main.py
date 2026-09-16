@@ -28,9 +28,8 @@ trains = {
     i: {
         "id": i,
         "speed": 0,
-        "limit": 0,
+        "limit": {"front": 0, "back": 0},
         "position": -1,
-        "now_edge": None,
         "direction": None,
         "mc": 0,
     } for i in range(3)
