@@ -45,10 +45,39 @@ const selectMapTemplate = () => {
     <ul>
       <li v-for="marker in map_now['map']" class="flex items-center m-4">
         <!-- {{marker}} -->
-        <div class="flex flex-col border-1 w-9/10 p-4">
+        <div class="flex flex-col border-1 w-50 p-4">
           <div>{{ marker.id }}番 {{marker.name}}</div>
+          <div>↑
+            <!-- <input>{{marker.limit.back}}</input> -->
+            <select 
+              v-model="marker.limit.back" 
+              @change="selectMapTemplate"
+              class="border rounded p-1 w-30"
+            >
+              <option :value="0">停止 (0)</option>
+              <option :value="80">警戒 (80)</option>
+              <option :value="160">注意 (160)</option>
+              <option :value="240">減速 (240)</option>
+              <option :value="300">進行 (300)</option>
+            </select> 
+          </div>
+          <div>↓
+            <!-- <input>{{marker.limit.front}}</input> -->
+            <select 
+              v-model="marker.limit.front" 
+              @change="selectMapTemplate"
+              class="border rounded p-1 w-30"
+            >
+              <option :value="0">停止 (0)</option>
+              <option :value="80">警戒 (80)</option>
+              <option :value="160">注意 (160)</option>
+              <option :value="240">減速 (240)</option>
+              <option :value="300">進行 (300)</option>
+            </select> 
+          </div>
+
         </div>
-        <div class="w-1/10 m-4">
+        <div class="w-2/10 m-4">
           <div v-if="marker.train">{{marker.train}}</div>
           <div v-else>車両なし</div>
         </div>
