@@ -7,13 +7,13 @@
     },
 
     "map": {
-      0: {"id": 0, "name": "車止め", "branch": null, "limit": {"front": 300, "back": 0}},
-      1: {"id": 1, "name": "第５閉塞", "branch": null, "limit": {"front": 300, "back": 60}},
-      2: {"id": 2, "name": "第４閉塞", "branch": null, "limit": {"front": 300, "back": 120}},
-      3: {"id": 3, "name": "第３閉塞", "branch": null, "limit": {"front": 240, "back": 240}},
-      4: {"id": 4, "name": "第２閉塞", "branch": null, "limit": {"front": 120, "back": 300}},
-      5: {"id": 5, "name": "第１閉塞", "branch": null, "limit": {"front": 60, "back": 300}},
-      6: {"id": 6, "name": "車止め", "branch": null, "limit": {"front": 0, "back": 300}}
+      "0": {"id": 0, "name": "車止め", "branch": null, "limit": {"front": 300, "back": 0}},
+      "1": {"id": 1, "name": "第５閉塞", "branch": null, "limit": {"front": 300, "back": 60}},
+      "2": {"id": 2, "name": "第４閉塞", "branch": null, "limit": {"front": 300, "back": 120}},
+      "3": {"id": 3, "name": "第３閉塞", "branch": null, "limit": {"front": 240, "back": 240}},
+      "4": {"id": 4, "name": "第２閉塞", "branch": null, "limit": {"front": 120, "back": 300}},
+      "5": {"id": 5, "name": "第１閉塞", "branch": null, "limit": {"front": 60, "back": 300}},
+      "6": {"id": 6, "name": "車止め", "branch": null, "limit": {"front": 0, "back": 300}}
     },
     "branch": null,
 

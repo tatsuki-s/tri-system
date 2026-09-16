@@ -53,18 +53,19 @@ trains = {
 topics = [("train/0", 0), ("train/1", 0), ("train/2", 0), ("train/+/limit", 0), ("emergency", 1), ("map/now", 0)]
 
 map_now = {}
+train_map = {}
 
 with open("data/maps.json", "r", encoding="utf-8") as f:
     MAPS_DATA = json.load(f)
 
 #現在のマップの状態を管理
-def build_graph(map_now, trains):
+def build_graph(train_map, trains):
     return {
         key: {
             **value,
             "status": None
         }
-        for key, value in data["map"].items()
+        for key, value in map_now["map"].items()
     }
 
 def on_connect(client, data, flags, rc):
@@ -74,21 +75,22 @@ def on_connect(client, data, flags, rc):
     #最初のメッセージ
     client.publish("map", json.dumps(MAPS_DATA), qos=1, retain=True)
 
-def update_limit(limit):
+def update_limit(new_limit, direction):
+    global trains
     for train_id in trains:
-        trains[train_id]["limit"] = limit
+        trains[train_id]["limit"]["direction"] = limit
 
     for i in range(len(trains)):
-        client.publish(f"train/{i}/limit", limit)
+        client.publish(f"train/{i}/limit", json.dumps(trains[train_id]["limit"]))
 
-# def set_limits():
-#     #車両間隔が近いときの制限の適用
-#     for i, data in trains.items():
-#         for j, item in trains.items():
-#             if i != j:
-#                 print(MAPS_DATA)
-#             print(item)
-#     print("update hazards", trains)
+def set_limits():
+    #車両間隔が近いときの制限の適用
+    pass
+    # for i, data in trains.items():
+    #     for j, item in train_map.items():
+    #         if i != j:
+    #             print(MAPS_DATA)
+    #         print(item)
         
 
 def on_message(client, data, msg):
@@ -100,13 +102,14 @@ def on_message(client, data, msg):
             train_id = int(msg.topic.split("/")[1])
 
             if msg.topic.endswith("/limit"):
-                trains[train_id]["limit"] = payload.get("limit", 0)
+                trains[train_id]["limit"] = payload.get("limit", json.dumps({"front": 0, "back": 0}))
             else:
                 trains[train_id]["speed"] = payload.get("speed", 0)
                 trains[train_id]["position"] = payload.get("position", None)
                 trains[train_id]["direction"] = payload.get("direction", None)
                 trains[train_id]["mc"] = payload.get("mc", 0)
-                build_graph(map_now)
+                if train_map:
+                    build_graph(train_map, trains)
 
             #set_limits()
 
