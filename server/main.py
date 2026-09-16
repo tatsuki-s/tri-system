@@ -38,9 +38,6 @@ trains = {
 topics = [("train/0", 0), ("train/1", 0), ("train/2", 0), ("train/+/limit", 0), ("emergency", 1), ("map/now", 0)]
 
 map_now = {}
-nodes = {}
-edges = {}
-node_edges = defaultdict(list)
 
 is_emergency = False
 
@@ -92,12 +89,23 @@ def on_connect(client, data, flags, rc):
     #最初のメッセージ
     client.publish("map", json.dumps(MAPS_DATA), qos=1, retain=True)
 
-def update_limit(limit):
+def update_limit(new_limit, direction):
+    global trains
     for train_id in trains:
-        trains[train_id]["limit"] = limit
+        trains[train_id]["limit"]["direction"] = limit
 
     for i in range(len(trains)):
-        client.publish(f"train/{i}/limit", limit)
+        client.publish(f"train/{i}/limit", json.dumps(trains[train_id]["limit"]))
+
+def set_limits():
+    #車両間隔が近いときの制限の適用
+    pass
+    # for i, data in trains.items():
+    #     for j, item in train_map.items():
+    #         if i != j:
+    #             print(MAPS_DATA)
+    #         print(item)
+        
 
 def on_message(client, data, msg):
     global trains, map_now, is_emergency
@@ -111,7 +119,7 @@ def on_message(client, data, msg):
             train_id = int(msg.topic.split("/")[1])
 
             if msg.topic.endswith("/limit"):
-                trains[train_id]["limit"] = payload.get("limit", 0)
+                trains[train_id]["limit"] = payload.get("limit", json.dumps({"front": 0, "back": 0}))
             else:
                 trains[train_id]["speed"] = payload.get("speed", 0)
                 trains[train_id]["direction"] = payload.get("direction", None)

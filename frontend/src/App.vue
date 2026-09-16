@@ -2,7 +2,7 @@
 import { onMounted, onUnmounted, ref, provide, watch } from 'vue'
 import { RouterView } from 'vue-router'
 import  mqtt from 'mqtt'
-import type RailwayMap from "@/types/map"
+import type { RailwayMap, Limit }  from "@/types/map"
 
 const mqttData = ref<any>(null)
 const mqttUrl = import.meta.env.VITE_MQTT_HOST || "localhost"
@@ -16,7 +16,7 @@ interface EmergencyData{
 interface TrainData{
   id: number,
   speed: number,
-  limit: number,
+  limit: Limit,
   position: number | null,
   now_edge: string | null,
   direction: boolean,

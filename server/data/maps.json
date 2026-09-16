@@ -6,61 +6,16 @@
       "loop": false
     },
 
-    "nodes": [
-      {
-        "id": 1,
-        "name": "第3閉塞",
-        "position": {
-          "x": 100,
-          "y": 100
-        },
-        "speedLimit": 300
-      },
-      {
-        "id": 2,
-        "name": "第2閉塞",
-        "position": {
-          "x": 100,
-          "y": 200
-        },
-        "speedLimit": 300
-      },
-      {
-        "id": 3,
-        "name": "第1閉塞",
-        "position": {
-          "x": 100,
-          "y": 300
-        },
-        "speedLimit": 300
-      },
-      {
-        "id": 4,
-        "name": "場内",
-        "position": {
-          "x": 100,
-          "y": 400
-        },
-        "speedLimit": 300
-      }
-    ],
-    "routes": [
-      {
-        "id": "R01",
-        "from": 1,
-        "to": 2
-      },
-      {
-        "id": "R02",
-        "from": 2,
-        "to": 3
-      },
-      {
-        "id": "R03",
-        "from": 3,
-        "to": 4
-      }
-    ],
+    "map": {
+      "0": {"id": 0, "name": "車止め", "branch": null, "limit": {"front": 300, "back": 0}, "now_train": null},
+      "1": {"id": 1, "name": "第５閉塞", "branch": null, "limit": {"front": 300, "back": 80}, "now_train": null},
+      "2": {"id": 2, "name": "第４閉塞", "branch": null, "limit": {"front": 300, "back": 160}, "now_train": null},
+      "3": {"id": 3, "name": "第３閉塞", "branch": null, "limit": {"front": 240, "back": 240}, "now_train": null},
+      "4": {"id": 4, "name": "第２閉塞", "branch": null, "limit": {"front": 160, "back": 300}, "now_train": null},
+      "5": {"id": 5, "name": "第１閉塞", "branch": null, "limit": {"front": 80, "back": 300}, "now_train": null},
+      "6": {"id": 6, "name": "車止め", "branch": null, "limit": {"front": 0, "back": 300}, "now_train": null}
+    },
+    "branch": null,
 
     "settings": {
       "defaultLimit": 300
