@@ -58,16 +58,6 @@ train_map = {}
 with open("data/maps.json", "r", encoding="utf-8") as f:
     MAPS_DATA = json.load(f)
 
-#現在のマップの状態を管理
-def build_graph(train_map, trains):
-    return {
-        key: {
-            **value,
-            "status": None
-        }
-        for key, value in map_now["map"].items()
-    }
-
 def on_connect(client, data, flags, rc):
     print("connected")
     client.subscribe(topics)
@@ -108,10 +98,6 @@ def on_message(client, data, msg):
                 trains[train_id]["position"] = payload.get("position", None)
                 trains[train_id]["direction"] = payload.get("direction", None)
                 trains[train_id]["mc"] = payload.get("mc", 0)
-                if train_map:
-                    build_graph(train_map, trains)
-
-            #set_limits()
 
             client.publish("trains", json.dumps([trains[i] for i in range(3)])) 
         if msg.topic == "emergency":
