@@ -50,7 +50,7 @@ with open("data/maps.json", "r", encoding="utf-8") as f:
 
 #在線処理
 def update_train_position(train_id, position, client):
-    global main_line_map, trains
+    global main_line_map
     #前の在線情報を削除
     print(main_line_map["main"])
     for marker in main_line_map["main"].values():
@@ -61,9 +61,6 @@ def update_train_position(train_id, position, client):
     #最新の在線状況
     main_line_map["main"][str(position)]["now_train"] = train_id
     client.publish("map/now", json.dumps(main_line_map))
-
-    #区間ごとの制限を適用
-    trains[train_id]["limit"] = main_line_map["main"][str(position)]["limit"]
     
 def on_connect(client, data, flags, rc):
     print("connected")
@@ -79,6 +76,8 @@ def update_limit(new_limit, direction):
 
     for i in range(len(trains)):
         client.publish(f"train/{i}/limit", json.dumps(trains[train_id]["limit"]))
+
+def set_limits():
     #車両間隔が近いときの制限の適用
     
     pass
