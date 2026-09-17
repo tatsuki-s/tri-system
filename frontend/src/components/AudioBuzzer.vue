@@ -94,36 +94,11 @@ defineExpose({
 </script>
 
 <template>
-  <div class="buzzer-card">
-    <!-- <h3>{{ title }}</h3> -->
-    <!-- <p class="spec">({{ frequency }}Hz / 間隔: {{ intervalMs }}ms)</p> -->
-    
-    <button class="start-btn" @click="button">鳴らす/止める</button>
-    <!-- <button class="stop-btn" @click="stopAlert">止める</button> -->
-    
-    <span :class="{ active: isPlaying }">
+  <div class="flex flex-col items-center justify-center p-4 mx-15">
+    <button @click="button" class="font-bold text-2xl">{{ props.title }}</button>
+    <div :class="{ active: isPlaying }">
       {{ isPlaying ? "鳴動中" : "停止中" }}
-    </span>
+    </div>
   </div>
 </template>
 
-<style scoped>
-.buzzer-card {
-  background: white;
-  padding: 20px;
-  margin: 15px 0;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  text-align: left;
-}
-h3 { margin: 0 0 5px 0; font-size: 1.1rem; }
-.spec { margin: 0 0 15px 0; color: #888; font-size: 0.85rem; }
-button {
-  font-weight: bold;
-  padding: 8px 16px;
-  margin-right: 10px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-</style>
