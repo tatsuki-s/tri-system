@@ -14,7 +14,7 @@ const selectMapTemplate = () => {
 
 </script>
 <template>
-  <!-- <p>現在：{{map_now}}</p> -->
+  <p>現在：{{map_now}}</p>
   <!-- <p>map：{{map_list}}</p> -->
   <div id="select_map">
     <p>ここに閉塞設定画面</p>
@@ -41,9 +41,8 @@ const selectMapTemplate = () => {
     <p v-else>マップデータが読み込まれていません</p>
   </div>
   <div v-if="map_now" id="main_line" class="w-1/2">
-    <!-- <p>{{map_now["map"] || "map not selected"}}</p> -->
     <ul>
-      <li v-for="marker in map_now['map']" class="flex items-center m-4">
+      <li v-for="marker in map_now['main']" class="flex items-center m-4">
         <!-- {{marker}} -->
         <div class="flex flex-col border-1 w-50 p-4">
           <div>{{ marker.id }}番 {{marker.name}}</div>
@@ -78,7 +77,7 @@ const selectMapTemplate = () => {
 
         </div>
         <div class="w-2/10 m-4">
-          <div v-if="marker.train">{{marker.train}}</div>
+          <div v-if="marker.now_train !== null">{{marker.now_train}}</div>
           <div v-else>車両なし</div>
         </div>
 

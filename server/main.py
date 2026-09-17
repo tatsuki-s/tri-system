@@ -36,7 +36,12 @@ trains = {
 }   
 topics = [("train/0", 0), ("train/1", 0), ("train/2", 0), ("train/+/limit", 0), ("emergency", 1), ("map/now", 0)]
 
-map_now = {}
+#現在の在線状況
+main_line_map = {}
+sub_main_line_map = {}
+
+#副本線開通かどうか
+sub_main_line = False
 
 is_emergency = False
 
@@ -44,8 +49,19 @@ with open("data/maps.json", "r", encoding="utf-8") as f:
     MAPS_DATA = json.load(f)
 
 #在線処理
-def update_train_position(train_id, new_edge):
-    pass
+def update_train_position(train_id, position, client):
+    global main_line_map
+    #前の在線情報を削除
+    print(main_line_map["main"])
+    for marker in main_line_map["main"].values():
+        if marker["now_train"] == train_id:
+            marker["now_train"] = None
+            print(train_id, "updated")
+        # print(marker)
+    #最新の在線状況    
+    main_line_map["main"][str(position)]["now_train"] = train_id
+    client.publish("map/now", json.dumps(main_line_map))
+
     
 def on_connect(client, data, flags, rc):
     print("connected")
@@ -64,6 +80,7 @@ def update_limit(new_limit, direction):
 
 def set_limits():
     #車両間隔が近いときの制限の適用
+    
     pass
     # for i, data in trains.items():
     #     for j, item in train_map.items():
@@ -73,7 +90,7 @@ def set_limits():
         
 
 def on_message(client, data, msg):
-    global trains, map_now, is_emergency
+    global trains, main_line_map, is_emergency
     print("onMessage!")
     try:
         payload = json.loads(msg.payload)
@@ -86,7 +103,10 @@ def on_message(client, data, msg):
                 trains[train_id]["speed"] = payload.get("speed", 0)
                 trains[train_id]["direction"] = payload.get("direction", None)
                 trains[train_id]["mc"] = payload.get("mc", 0)
-                trains[train_id]["position"] =payload.get("position", -1) 
+                trains[train_id]["position"] = payload.get("position", -1) 
+
+                if not payload.get("position") == -1:
+                    update_train_position(train_id, trains[train_id]["position"], client)
 
             client.publish("trains", json.dumps([trains[i] for i in range(3)])) 
         if msg.topic == "emergency":
@@ -97,8 +117,8 @@ def on_message(client, data, msg):
             else:
                 update_limit(300)
         if msg.topic == ("map/now"):
-            map_now = json.loads(json.dumps(payload))
-            # print("map_now:",  payload)
+            main_line_map = json.loads(json.dumps(payload))
+            # print("main_line_map:",  payload)
 
     except Exception as e:
         print("json parse error", e)

@@ -17,7 +17,7 @@ export interface position{
     name: string,
     loop: true | false
   },
-  map: Map,
+  main: Map,
   branch: Map,
   settings: {
     defaultLimit: number

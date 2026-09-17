@@ -11,6 +11,7 @@
   import forwardAlert_OFF from '@/assets/img/Meter/forwardAlert_OFF.png'
   import Alert from "@/assets/sounds/Alert.mp3"
   import ATCSound from "@/assets/sounds/ATC-LimSpeedUpdate.WAV"
+  import type { Limit }  from "@/types/map"
 
   let alertSound :HTMLAudioElement | null = null
   let ATCLimSpeedUpdate :HTMLAudioElement | null
@@ -30,10 +31,21 @@
 
   const hari = ref<HTMLElement | null>(null)
   const ATC = ref<HTMLElement | null>(null)
+  
+  const limitByDirection = (direction: boolean | null, limit:Limit) => {
+    if(direction){
+      console.log(limit["front"], "limit update ")
+      return limit["front"]
+    }
+    else if(direction === false){
+      return limit["back"]
+    }
+    return 0
+  }
 
   watch(()=>props.data , ( newValue , oldValue )=>{
     speed_update( oldValue.speed , newValue.speed)
-    ATCLimP_update( newValue.limit )
+    ATCLimP_update( limitByDirection(newValue.direction, newValue.limit))
   },{
   deep: true
   })
