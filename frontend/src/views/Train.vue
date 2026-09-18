@@ -3,6 +3,7 @@ import { ref, inject, computed } from "vue"
 import { useRoute } from "vue-router"
 import SpeedMeter from "@/components/SpeedMeter.vue"
 import { type TRIReceivedTrainData, TRIReceivedTrainDataDefault } from "@/types/TRITypes"
+import EmergencyButton from "@/components/EmergencyButton.vue"
 const trains = inject<any>("trains")
 //const ReceivedData = ref<TRIReceivedTrainData>({...TRIReceivedTrainDataDefault})
 const route = useRoute()
@@ -15,8 +16,8 @@ const clock = ref(false)
 </script>
 <template>
   <div>
-    <p>ここに運転台モニター</p>
-    <div id="main" v-for="train in trains">
+    <!-- <p>ここに運転台モニター</p> -->
+    <div id="main" class="flex" v-for="train in trains">
       <div v-if="train.id.toString() === $route.params.id"
         id="MainMonitor">
         <!-- <p>{{train}}</p> -->
@@ -25,6 +26,7 @@ const clock = ref(false)
           :data="ReceivedData", 
           :clock="clock"/>
       </div>
+      <EmergencyButton class="rounded-full size-50 bg-red-600 text-white font-bold"/>
     </div>
   </div>
 </template>
@@ -35,7 +37,7 @@ const clock = ref(false)
 }
 #MainMonitor{
   height: 100vh;
-  width: 100vw;
+  width: 100vh;
 }
 #SpeedMeter{
   width: 40vw; 
