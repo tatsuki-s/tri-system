@@ -55,9 +55,15 @@ mqtt_data = {
     "direction": True,
     "mc": 0
     }
-limit = 0
+limit = {"front": 0, "back": 0}
 
 uart_last_received = time.ticks_ms()
+
+def direction_word(direction: bool):
+    if direction:
+        return "front"
+    else:
+        return "back"
 
 async def drive():
     global mqtt_data, is_emergency, limit
@@ -97,7 +103,7 @@ async def drive():
         mc_value = adc.read_u16()
         vol_step = generate_step(mc_value)
         switch_direc = get_direction()
-        limit_duty = min(limit * 200, MAX_DUTY)
+        limit_duty = min(int(limit[switch_direc]) * 200 if switch_direc is not None else 0, MAX_DUTY)
 
         elapsed = time.ticks_diff(
             time.ticks_ms(),
@@ -109,7 +115,7 @@ async def drive():
             is_emergency = True
             print("EMERGENCY!")
 
-        print(duty, limit)
+        print(duty, limit, switch_direc)
         #ディレクションスイッチの変更を検知
         if (switch_direc != now_direc) or (switch_direc is None):
             if duty > 0:
@@ -150,7 +156,7 @@ async def mqtt_read():
         try:
             data = json.loads(msg)
             print("受信:", topic, data)
-            limit = int(data)
+            limit = json.loads(data)
         except Exception as e:
             print("受信処理エラー:", e)
 
@@ -178,7 +184,7 @@ async def mqtt_send():
                 is_connected = False
         else:
             led.off()
-        print(limit)
+        # print(limit)
         await asyncio.sleep(1.0)
 
 async def receive_uart():

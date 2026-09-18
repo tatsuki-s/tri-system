@@ -48,6 +48,21 @@ is_emergency = False
 with open("data/maps.json", "r", encoding="utf-8") as f:
     MAPS_DATA = json.load(f)
 
+def update_limit(new_limit, direction):
+    global trains
+    for train_id in trains:
+        trains[train_id]["limit"]["direction"] = limit
+
+    #車両間隔が近いときの制限の適用
+    
+    # for i, data in trains.items():
+    #     for j, item in train_map.items():
+    #         if i != j:
+    #             print(MAPS_DATA)
+    #         print(item)
+    for i in range(len(trains)):
+        client.publish(f"train/{i}/limit", json.dumps(trains[train_id]["limit"]))
+        
 #在線処理
 def update_train_position(train_id, position, client):
     global main_line_map, trains
@@ -63,7 +78,9 @@ def update_train_position(train_id, position, client):
     client.publish("map/now", json.dumps(main_line_map))
 
     #区間ごとの制限を適用
-    trains[train_id]["limit"] = main_line_map["main"][str(position)]["limit"]
+    new_limit_json = main_line_map["main"][str(position)]["limit"]
+    # trains[train_id]["limit"] = new_limit_json
+    # client.publish(f"train/{train_id}/limit", json.dumps(new_limit_json))
     
 def on_connect(client, data, flags, rc):
     print("connected")
@@ -72,22 +89,6 @@ def on_connect(client, data, flags, rc):
     #最初のメッセージ
     client.publish("map", json.dumps(MAPS_DATA), qos=1, retain=True)
 
-def update_limit(new_limit, direction):
-    global trains
-    for train_id in trains:
-        trains[train_id]["limit"]["direction"] = limit
-
-    for i in range(len(trains)):
-        client.publish(f"train/{i}/limit", json.dumps(trains[train_id]["limit"]))
-    #車両間隔が近いときの制限の適用
-    
-    pass
-    # for i, data in trains.items():
-    #     for j, item in train_map.items():
-    #         if i != j:
-    #             print(MAPS_DATA)
-    #         print(item)
-        
 
 def on_message(client, data, msg):
     global trains, main_line_map, is_emergency
@@ -113,9 +114,9 @@ def on_message(client, data, msg):
             print(payload)
             is_emergency = payload.get("status", True)
             if is_emergency:
-                update_limit(0)
+                update_limit(0, direction)
             else:
-                update_limit(300)
+                update_limit(300, direction)
         if msg.topic == ("map/now"):
             main_line_map = json.loads(json.dumps(payload))
             # print("main_line_map:",  payload)
