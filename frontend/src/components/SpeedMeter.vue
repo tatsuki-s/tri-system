@@ -33,7 +33,7 @@
   const ATC = ref<HTMLElement | null>(null)
   
   const limitByDirection = (direction: boolean | null, limit:Limit) => {
-    console.log(limit, "limit update ")
+    // console.log(limit, "limit update ")
     if(direction === true){
       return limit.front
     }
@@ -45,9 +45,13 @@
 
   watch(()=>props.data , ( newValue , oldValue )=>{
     speed_update( oldValue.speed , newValue.speed)
-    ATCLimP_update( limitByDirection(newValue.direction, newValue.limit))
-    ATCLimSpeedUpdate?.play()
-    console.log(newValue)
+    const newLimit = limitByDirection(newValue.direction, newValue.limit) 
+    const oldLimit = limitByDirection(oldValue.direction, oldValue.limit) 
+    ATCLimP_update( newLimit )
+    if (newLimit !== oldLimit){
+      ATCLimSpeedUpdate?.play()
+      console.log(newValue)
+    }
   },{
   deep: true
   })
