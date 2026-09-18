@@ -46,19 +46,12 @@
   watch(()=>props.data , ( newValue , oldValue )=>{
     speed_update( oldValue.speed , newValue.speed)
     ATCLimP_update( limitByDirection(newValue.direction, newValue.limit))
+    ATCLimSpeedUpdate?.play()
     console.log(newValue)
   },{
   deep: true
   })
 
-//  watch(
-//    ()=>props.data.limit ,
-//      (newValue, oldValue)=>{
-//        if (props.data.atc){
-//          ATCLimSpeedUpdate?.play()
-//        }
-//  })
-  
   let isAni = false
   const speed_update = ( start:number , end:number ) => {
     if(!hari.value||isAni){return}
