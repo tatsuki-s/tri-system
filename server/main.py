@@ -48,7 +48,7 @@ is_emergency = False
 with open("data/maps.json", "r", encoding="utf-8") as f:
     MAPS_DATA = json.load(f)
 
-def update_limit(new_limit, direction):
+def update_limit(limit, direction):
     global trains
     for train_id in trains:
         trains[train_id]["limit"]["direction"] = limit
