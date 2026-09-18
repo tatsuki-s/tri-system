@@ -34,7 +34,7 @@ trains = {
         "mc": 0,
     } for i in range(3)
 }   
-topics = [("train/0", 0), ("train/1", 0), ("train/2", 0), ("train/+/limit", 0), ("emergency", 1), ("map/now", 0)]
+topics = [("train/0", 0), ("train/1", 0), ("train/2", 0), ("emergency", 1), ("map/now", 0)]
 
 #現在の在線状況
 main_line_map = {}
