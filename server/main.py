@@ -60,9 +60,12 @@ def update_limit(new_limit, direction):
     #         if i != j:
     #             print(MAPS_DATA)
     #         print(item)
+
+#各車両に速度制限JSONを送りつける
+def send_train_limit(client):
     for i in range(len(trains)):
-        client.publish(f"train/{i}/limit", json.dumps(trains[train_id]["limit"]))
-        
+        client.publish(f"train/{i}/limit", json.dumps(trains[i]["limit"]))
+
 #在線処理
 def update_train_position(train_id, position, client):
     global main_line_map, trains
@@ -79,8 +82,8 @@ def update_train_position(train_id, position, client):
 
     #区間ごとの制限を適用
     new_limit_json = main_line_map["main"][str(position)]["limit"]
-    # trains[train_id]["limit"] = new_limit_json
-    # client.publish(f"train/{train_id}/limit", json.dumps(new_limit_json))
+    trains[train_id]["limit"] = new_limit_json
+    client.publish(f"train/{train_id}/limit", json.dumps(new_limit_json))
     
 def on_connect(client, data, flags, rc):
     print("connected")
@@ -98,9 +101,7 @@ def on_message(client, data, msg):
         if msg.topic.startswith("train/"):
             train_id = int(msg.topic.split("/")[1])
 
-            if msg.topic.endswith("/limit"):
-                trains[train_id]["limit"] = payload.get("limit", json.dumps({"front": 0, "back": 0}))
-            else:
+            if not msg.topic.endswith("/limit"):
                 trains[train_id]["speed"] = payload.get("speed", 0)
                 trains[train_id]["direction"] = payload.get("direction", None)
                 trains[train_id]["mc"] = payload.get("mc", 0)
@@ -110,6 +111,7 @@ def on_message(client, data, msg):
                     update_train_position(train_id, trains[train_id]["position"], client)
 
             client.publish("trains", json.dumps([trains[i] for i in range(3)])) 
+            send_train_limit(client)
         if msg.topic == "emergency":
             print(payload)
             is_emergency = payload.get("status", True)
