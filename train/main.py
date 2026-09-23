@@ -103,7 +103,7 @@ async def drive():
         mc_value = adc.read_u16()
         vol_step = generate_step(mc_value)
         switch_direc = get_direction()
-        limit_duty = min(int(limit[switch_direc]) * 200 if switch_direc is not None else 0, MAX_DUTY)
+        limit_duty = min(int(limit[switch_direc]) * 200, MAX_DUTY)
 
         elapsed = time.ticks_diff(
             time.ticks_ms(),

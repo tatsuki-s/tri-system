@@ -38,7 +38,7 @@ provide("map_now", map_now)
 
 const handleMessage = (receivedTopic: string, msg: any) => {
   const rawData = msg.toString()
-  console.log("生データ:",rawData)
+  // console.log("生データ:",rawData)
   switch(receivedTopic) {
     case "trains":
       trains.value = JSON.parse(rawData)

@@ -53,13 +53,47 @@ def update_limit(limit, direction):
     for train_id in trains:
         trains[train_id]["limit"]["direction"] = limit
 
-    #車両間隔が近いときの制限の適用
-    
-    # for i, data in trains.items():
-    #     for j, item in train_map.items():
-    #         if i != j:
-    #             print(MAPS_DATA)
-    #         print(item)
+def get_front_train(train_id):
+    train = trains[train_id]
+
+    position = train["position"]
+    direction = train["direction"]
+
+    if position == -1 or direction is None:
+        return None
+
+    candidates = []
+
+    for other_id, other in trains.items():
+        if other_id == train_id:
+            continue
+
+        other_position = other["position"]
+
+        if other_position == -1:
+            continue
+
+        if direction is True:
+            distance = other_position - position
+        else:
+            distance = position - other_position
+
+        if distance > 0:
+            candidates.append((distance, other_id))
+
+    if not candidates:
+        return None
+    # 最寄りの車両だけ判断対象に
+    return min(candidates)
+
+def get_block_limit(train_id):
+    result = get_front_train(train_id)
+
+    if result is None:
+        return 300
+
+    distance, _ = result
+    return DISTANCE_LIMIT[min(distance, 5)]
 
 #各車両に速度制限JSONを送りつける
 def send_train_limit(client):
@@ -92,10 +126,12 @@ def on_connect(client, data, flags, rc):
     #最初のメッセージ
     client.publish("map", json.dumps(MAPS_DATA), qos=1, retain=True)
 
-
 def on_message(client, data, msg):
     global trains, main_line_map, is_emergency
     print("onMessage!")
+    print("limit0", get_block_limit(0))
+    print("limit1", get_block_limit(1))
+    print("limit2", get_block_limit(2))
     try:
         payload = json.loads(msg.payload)
         if msg.topic.startswith("train/"):
