@@ -60,10 +60,13 @@ limit = {"front": 0, "back": 0}
 uart_last_received = time.ticks_ms()
 
 def direction_word(direction: bool):
-    if direction:
-        return "front"
+    if direction is not None:
+        if direction:
+            return "front"
+        else:
+            return "back"
     else:
-        return "back"
+        return None
 
 async def drive():
     global mqtt_data, is_emergency, limit
@@ -166,7 +169,7 @@ async def mqtt_send():
     is_connected = False
     # await client.connect()
     led = machine.Pin("LED", machine.Pin.OUT)
-    emergency_data = {"status": True, "sender": f"train{mqtt_data["id"]}" }
+    emergency_data = {"status": True, "sender": f"train{mqtt_data['id']}" }
 
     while True:
         # print(wlan.isconnected(), is_connected, gc.mem_free(), wlan.status())

@@ -115,8 +115,14 @@ def update_train_position(train_id, position, client):
     client.publish("map/now", json.dumps(main_line_map))
 
     #区間ごとの制限を適用
-    new_limit_json = main_line_map["main"][str(position)]["limit"]
+    new_limit_json = main_line_map["main"][str(position)]["limit"].copy()
     trains[train_id]["limit"] = new_limit_json
+    # 車両間距離の制限
+    direc_value = trains[train_id]["direction"]
+    if direc_value is None:
+        return
+    direc = "front" if direc_value else "back"
+    trains[train_id]["limit"][direc] = get_block_limit(train_id)
     client.publish(f"train/{train_id}/limit", json.dumps(new_limit_json))
     
 def on_connect(client, data, flags, rc):
