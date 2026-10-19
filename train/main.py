@@ -159,7 +159,7 @@ async def mqtt_read():
         try:
             data = json.loads(msg)
             print("受信:", topic, data)
-            limit = json.loads(data)
+            limit = data
         except Exception as e:
             print("受信処理エラー:", e)
 
