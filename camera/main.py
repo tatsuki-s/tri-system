@@ -42,7 +42,7 @@ class ArUcoProcess:
             for i in range(len(ids)):
                 c = corners[i][0]
                 area = cv2.contourArea(c)
-                read_id = ids[i][0]
+                read_id = int(ids[i].item())
                 areas[str(read_id)] = area
                 # print("ID:", ID, "面積:", area )
 
