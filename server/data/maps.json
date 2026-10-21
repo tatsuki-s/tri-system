@@ -38,5 +38,28 @@
     "settings": {
       "defaultLimit": 300
     }
+  },
+  {
+    "description": {
+      "id": "kosensai-2026",
+      "name": "高専祭2026",
+      "loop": true
+    },
+
+    "main": {
+      "0": {"id": 0, "name": "場内", "branch": null, "limit": {"front": 300, "back": 300}, "now_train": null},
+      "1": {"id": 1, "name": "第５閉塞", "branch": null, "limit": {"front": 300, "back": 300}, "now_train": null},
+      "2": {"id": 2, "name": "第４閉塞", "branch": null, "limit": {"front": 300, "back": 300}, "now_train": null},
+      "3": {"id": 3, "name": "第３閉塞", "branch": null, "limit": {"front": 300, "back": 300}, "now_train": null},
+      "4": {"id": 4, "name": "第２閉塞", "branch": null, "limit": {"front": 300, "back": 300}, "now_train": null},
+      "5": {"id": 5, "name": "第１閉塞", "branch": null, "limit": {"front": 300, "back": 300}, "now_train": null},
+      "6": {"id": 6, "name": "車止め", "branch": null, "limit": {"front": 300, "back": 300}, "now_train": null}
+    },
+    "branch": {
+      "7": {"id": 7, "name": "分岐", "branch": null, "limit": {"front": 160, "back": 160}, "now_train": null}
+    },
+    "settings": {
+      "defaultLimit": 300
+    }
   }
 ]
