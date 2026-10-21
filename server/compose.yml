@@ -7,4 +7,12 @@ services:
       - "9001:9001" # WebSockets用
     volumes:
       - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:Z
-
+  python:
+    container_name: python_debug
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: dev
+    volumes:
+      - .:/server:Z
+      - ./data:/server/data:ro,Z
