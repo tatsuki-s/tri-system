@@ -3,7 +3,7 @@ include:
   - path: ./server/compose.yml
 services:
   frontend:
-    image: node:23
+    image: node:22
     build: 
       context: ./frontend
       target: dev
